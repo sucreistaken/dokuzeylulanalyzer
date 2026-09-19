@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback.
+# Gercek dosyalar (index.html, /assets/*, /data/*.json) once servis edilir;
+# yalnizca var olmayan yollar index.html'e duser.
+/*    /index.html    200

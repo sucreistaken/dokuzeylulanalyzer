@@ -1,0 +1,30 @@
+node_modules
+dist
+dist-ssr
+*.local
+
+# Ortam degiskenleri asla commitlenmez
+.env
+.env.*
+!.env.example
+
+# Scraper ara ciktilari
+tools/scraper/.cache/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.log
+
+# Playwright MCP ciktilari
+.playwright-mcp/
+*.png
+
+# Python
+__pycache__/
+*.pyc
+
+# Transkript PDFleri asla commitlenmez (kisisel veri icerir)
+*.pdf

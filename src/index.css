@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+}
+
+/* Satir rengi Ant Design'in kendi hucre arka planini geciyor. */
+.ant-table-tbody > tr.bg-orange-100 > td,
+.ant-table-tbody > tr.bg-red-100 > td,
+.ant-table-tbody > tr.bg-green-50 > td {
+    background: transparent;
+}
