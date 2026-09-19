@@ -96,8 +96,10 @@ const ProgramPrereq: React.FC = () => {
                 <Empty
                     description={
                         <span>
-                            Katalogda bu programin hicbir dersinde on kosul tanimli degil.
-                            Yani bir dersten kalmak baska bir dersi kilitlemez.
+                            DEU Ders Katalogu bu programin hicbir dersinde on kosul
+                            tanimlamamis. Bu, fakultenin kendi ogretim ve sinav uygulama
+                            esaslarinda bir kosul olmadigi anlamina gelmez; emin olmak
+                            icin danismanina sor.
                         </span>
                     }
                 />

@@ -102,10 +102,12 @@ const PrereqImpact: React.FC = () => {
             <Alert
                 type="info"
                 showIcon
-                message="Bu programda on kosullu ders yok"
+                message="Bu programda katalogda tanimli on kosul yok"
                 description={
-                    'Katalogda bu programin hicbir dersinde "Dersin On Kosulu" alani ' +
-                    'dolu degil. Yani bir dersten kalmak baska bir dersi kilitlemez.'
+                    'DEU Ders Katalogu bu programin hicbir dersinde "Dersin On Kosulu" ' +
+                    'alanini doldurmamis. Bu, fakultenin kendi ogretim ve sinav ' +
+                    'uygulama esaslarinda bir kosul olmadigi anlamina gelmez; ' +
+                    'emin olmak icin danismanina sor.'
                 }
             />
         )

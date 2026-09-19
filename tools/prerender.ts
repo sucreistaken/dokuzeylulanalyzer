@@ -68,8 +68,9 @@ function programBody(program: ProgramData): string {
         // Onkosulsuz programda da anlamli bir sayfa cikmali; bos govde
         // hem kullaniciya hem arama motoruna hicbir sey soylemez.
         head.push(
-            '<p>Katalogda bu programin hicbir dersinde on kosul tanimli degil. '
-            + 'Bir dersten kalmak baska bir dersi kilitlemez.</p>',
+            '<p>DEU Ders Katalogu bu programin hicbir dersinde on kosul tanimlamamis. '
+            + 'Bu, fakultenin kendi ogretim ve sinav uygulama esaslarinda bir kosul '
+            + 'olmadigi anlamina gelmez; emin olmak icin danismaniniza sorun.</p>',
         )
         return head.join('\n')
     }
