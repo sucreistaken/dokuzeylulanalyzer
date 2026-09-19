@@ -45,6 +45,24 @@ export interface CatalogCourse {
     /** Havuz dersiyse kapsami; degilse null. */
     poolScope: PoolScope | null
     detail: string
+    /**
+     * Katalogdaki "Dersin Onkosulu/Onkosullari" alani. Onkosul yoksa bos dizi.
+     *
+     * Eski public/data ile acilan tarayicilarda alan hic olmayabilir; okuma
+     * tarafi daima `course.prerequisites ?? []` ile savunmali davranmali.
+     */
+    prerequisites?: Prerequisite[]
+}
+
+/**
+ * Tek bir onkosul kaydi.
+ *
+ * `code` bos olabilir: katalogda nadiren "KOD - AD" kalibina uymayan serbest
+ * metin duruyor. O kayit grafige giremez ama kullaniciya gosterilir.
+ */
+export interface Prerequisite {
+    code: string
+    name: string
 }
 
 /**

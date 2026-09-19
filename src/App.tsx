@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Card, ConfigProvider, Layout, Spin, Typography } from 'antd'
 import trTR from 'antd/locale/tr_TR'
 import { Provider, useDispatch } from 'react-redux'
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { BarChartOutlined } from '@ant-design/icons'
+import ProgramPrereq from './pages/ProgramPrereq'
 import { store } from './store'
 import { hydrate } from './store/courseSlice'
 import { loadState } from './lib/storage'
@@ -11,6 +13,7 @@ import type { ProgramData } from './types'
 import ProgramSelector from './components/ProgramSelector'
 import CourseStats from './components/CourseStats'
 import CourseTable from './components/CourseTable'
+import PrereqImpact from './components/PrereqImpact'
 import TranscriptImport from './components/TranscriptImport'
 import SummaryBar from './components/SummaryBar'
 
@@ -68,54 +71,75 @@ const AppContent: React.FC = () => {
     }
 
     return (
-        <Layout className="min-h-screen">
-            <Header className="flex items-center justify-between bg-gray-50 shadow">
-                <div className="flex items-center">
-                    <BarChartOutlined style={{ fontSize: 24, marginRight: 10 }} />
-                    <Title level={3} className="m-3 py-4">
-                        DEU Ders Analiz
-                    </Title>
-                </div>
-                <div className="hidden text-sm text-gray-500 sm:block">
-                    Dokuz Eylul Universitesi
-                </div>
-            </Header>
-
-            <Content className="bg-[#F0F2F5] p-4 pb-20 md:p-6 md:pb-20">
-                <div className="mx-auto flex max-w-6xl flex-col space-y-5">
-                    {/* Ana giris noktasi: transkript yukle, program ve notlar otomatik gelsin. */}
-                    <TranscriptImport variant="hero" />
-
-                    <Card title="Program Secimi" className="shadow">
-                        <div className="mb-3 text-sm text-gray-500">
-                            Transkriptin yoksa ya da programini elle secmek istersen buradan sec.
-                        </div>
-                        <ProgramSelector />
-                    </Card>
-                    <Card title="Istatistikler" className="shadow">
-                        <CourseStats />
-                    </Card>
-                    <Card title="Ders Plani" className="shadow">
-                        <CourseTable />
-                    </Card>
-                </div>
-            </Content>
-
-            <Footer className="bg-[#F0F2F5] pb-16 text-center text-xs text-gray-500">
-                Ders verileri DEU Ders Katalogu / Bilgi Paketi'nden alinmistir. Resmi bir
-                DEU uygulamasi degildir; notlariniz yalnizca bu tarayicida saklanir.
-                Kesin bilgi icin transkriptinizi esas alin.
-            </Footer>
-
-            <SummaryBar />
-        </Layout>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            {/* Herkese acik on kosul haritasi; transkript gerektirmez. */}
+            <Route path="/program/:id" element={<ProgramPrereq />} />
+        </Routes>
     )
 }
+
+/** Transkript + kisisel analiz ekrani. */
+const Home: React.FC = () => (
+    <div className="flex flex-col space-y-5">
+        {/* Ana giris noktasi: transkript yukle, program ve notlar otomatik gelsin. */}
+        <TranscriptImport variant="hero" />
+
+        <Card title="Program Secimi" className="shadow">
+            <div className="mb-3 text-sm text-gray-500">
+                Transkriptin yoksa ya da programini elle secmek istersen buradan sec.
+            </div>
+            <ProgramSelector />
+        </Card>
+        <Card title="Istatistikler" className="shadow">
+            <CourseStats />
+        </Card>
+        <Card title="On Kosul Etkisi" className="shadow">
+            <PrereqImpact />
+        </Card>
+        <Card title="Ders Plani" className="shadow">
+            <CourseTable />
+        </Card>
+    </div>
+)
+
+/** Her rotanin paylastigi baslik, alt bilgi ve ozet cubugu. */
+const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <Layout className="min-h-screen">
+        <Header className="flex items-center justify-between bg-gray-50 shadow">
+            <Link to="/" className="flex items-center text-inherit">
+                <BarChartOutlined style={{ fontSize: 24, marginRight: 10 }} />
+                <Title level={3} className="m-3 py-4">
+                    DEU Ders Analiz
+                </Title>
+            </Link>
+            <div className="hidden text-sm text-gray-500 sm:block">
+                Dokuz Eylul Universitesi
+            </div>
+        </Header>
+
+        <Content className="bg-[#F0F2F5] p-4 pb-20 md:p-6 md:pb-20">
+            <div className="mx-auto max-w-6xl">{children}</div>
+        </Content>
+
+        <Footer className="bg-[#F0F2F5] pb-16 text-center text-xs text-gray-500">
+            Ders verileri DEU Ders Katalogu / Bilgi Paketi'nden alinmistir. Resmi bir
+            DEU uygulamasi degildir; notlariniz yalnizca bu tarayicida saklanir.
+            Kesin bilgi icin transkriptinizi esas alin.
+        </Footer>
+
+        <SummaryBar />
+    </Layout>
+)
 
 const App: React.FC = () => (
     <ConfigProvider locale={trTR}>
         <Provider store={store}>
-            <AppContent />
+            <BrowserRouter>
+                <Shell>
+                    <AppContent />
+                </Shell>
+            </BrowserRouter>
         </Provider>
     </ConfigProvider>
 )

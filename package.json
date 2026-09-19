@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && tsx tools/prerender.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "scrape": "python3 tools/scraper/scrape.py",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name=deu-ders-analiz --branch=main --commit-dirty=true"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=deu-ders-analiz --branch=main --commit-dirty=true",
+    "prerender": "tsx tools/prerender.ts"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.0",
@@ -18,15 +19,18 @@
     "pdfjs-dist": "^4.10.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^9.0.4"
+    "react-redux": "^9.0.4",
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@types/node": "^26.6.2",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vitest": "^1.6.0",

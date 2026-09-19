@@ -13,6 +13,7 @@ Cikti:
 Bagimlilik yok, sadece Python 3 stdlib.
 """
 
+import concurrent.futures
 import html
 import json
 import os
@@ -29,9 +30,17 @@ USER_AGENT = "Mozilla/5.0 (compatible; dokuzeylul-analyzer/0.1; +https://dokuzey
 REQUEST_DELAY = 0.2
 MAX_RETRIES = 3
 
+# Onkosul gecisi ders basina bir detay sayfasi indirir (~40 bin sayfa).
+# Es zamanlilik bu yuzden sinirli tutulur; amac DEU sunucusunu zorlamak degil.
+DETAIL_WORKERS = int(os.environ.get("DEU_DETAIL_WORKERS", "8"))
+DETAIL_DELAY = 0.25
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT_DIR = os.path.join(ROOT, "public", "data")
 PROGRAMS_DIR = os.path.join(OUT_DIR, "programs")
+# Indirilen detay sayfalari diske yazilir; parser duzeltmesi agi tekrar
+# dovmeden kosabilsin. .gitignore'da zaten haric tutuluyor.
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache", "detail")
 
 LEVELS = OrderedDict([
     ("lisans", ("tr-c3.html", "Lisans")),
@@ -50,6 +59,12 @@ EXPECTED_COURSE_COUNTS = {
     "1176": 126,   # Isletme, "Toplam Kalite Yonetimi" gibi tuzak isimler
     "10005": 68,   # Butunlesik Doktora, farkli HTML varyanti
     "1099": 205,   # BOTE, en genis secmeli havuzlarindan biri
+}
+
+# Onkosulu dolu ders sayisi. 1198 icin katalogun 249 ders sayfasi tek tek
+# okunarak elle dogrulandi; onkosul parser'inin sessizce bosalmasini yakalar.
+EXPECTED_PREREQ_COUNTS = {
+    "1198": 16,    # Insaat Muhendisligi
 }
 
 
@@ -80,6 +95,104 @@ WS_RE = re.compile(r"\s+")
 
 def text(fragment):
     return WS_RE.sub(" ", html.unescape(TAG_RE.sub("", fragment))).strip()
+
+
+# --------------------------------------------------------------------------
+# Onkosul: ders detay sayfasindaki "Dersin Onkosulu/Onkosullari" alani
+# --------------------------------------------------------------------------
+#
+# Sayfa yapisi (unescape sonrasi):
+#   <h4 class="colored">Dersin Önkoşulu/Önkoşulları</h4></td>
+#   </tr><tr bgcolor="#F0EEEC"><td>
+#   <p align="justify">İNŞ 1012 - STATİK<br/></p>
+#
+# Bos alan "Yok" yazar. Birden fazla onkosul <br/> ile ayrilir.
+
+# Basliktaki O harfi kaynakta hem duz hem &Ouml; olarak gecebiliyor; once
+# unescape edip duz metin uzerinde arariz.
+PREREQ_HEADING_RE = re.compile(
+    r"Dersin\s*Önkoşulu\s*/\s*Önkoşulları\s*</h4>(.*?)</table>",
+    re.S | re.I,
+)
+PREREQ_CELL_RE = re.compile(r"<p[^>]*>(.*?)</p>", re.S | re.I)
+PREREQ_CODE_RE = re.compile(r"^([A-ZÇĞİÖŞÜ]{2,5}\s*\d{3,4})\s*[-–]\s*(.+)$")
+
+
+def parse_prerequisites(page):
+    """
+    Detay sayfasindan [{"code": ..., "name": ...}] cikarir.
+
+    Onkosul yoksa bos liste doner. Alan hic bulunamazsa da bos liste doner;
+    fark "kapsama raporu" ile yakalanir, burada sessizce patlamayiz.
+    """
+    unescaped = html.unescape(page)
+    block = PREREQ_HEADING_RE.search(unescaped)
+    if not block:
+        return []
+
+    cell = PREREQ_CELL_RE.search(block.group(1))
+    if not cell:
+        return []
+
+    # <br> satir ayiricidir; once ona bolup sonra kalan etiketleri temizle.
+    raw = re.sub(r"<br\s*/?>", "\n", cell.group(1), flags=re.I)
+    out = []
+    for line in raw.split("\n"):
+        line = WS_RE.sub(" ", TAG_RE.sub("", line)).strip()
+        if not line or line.lower() in ("yok", "-"):
+            continue
+        m = PREREQ_CODE_RE.match(line)
+        if m:
+            out.append({
+                "code": WS_RE.sub(" ", m.group(1)).strip(),
+                "name": m.group(2).strip(),
+            })
+        else:
+            # Kod/isim kalibina uymayan serbest metin (orn. "Bolum onayi").
+            # Grafige giremez ama kullaniciya gosterilebilsin diye saklanir.
+            out.append({"code": "", "name": line})
+    return out
+
+
+def fetch_detail(path):
+    """Detay sayfasini diskten okur, yoksa indirip diske yazar."""
+    cached = os.path.join(CACHE_DIR, path)
+    if os.path.exists(cached):
+        with open(cached, "r", encoding="utf-8") as fh:
+            return fh.read()
+
+    page = fetch(BASE + path)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    tmp = cached + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write(page)
+    # Yarim yazilmis dosya cache'e girmesin; yeniden kosuda bozuk veri olur.
+    os.replace(tmp, cached)
+    time.sleep(DETAIL_DELAY)
+    return page
+
+
+def enrich_prerequisites(courses, pool):
+    """
+    Her derse `prerequisites` alanini ekler. Yerinde degistirir.
+
+    Doner: (basarili_sayisi, hata_sayisi)
+    """
+    def work(course):
+        try:
+            return course, parse_prerequisites(fetch_detail(course["detail"])), None
+        except Exception as err:  # noqa: BLE001
+            return course, [], err
+
+    ok = 0
+    failed = 0
+    for course, prereqs, err in pool.map(work, courses):
+        course["prerequisites"] = prereqs
+        if err is None:
+            ok += 1
+        else:
+            failed += 1
+    return ok, failed
 
 
 # --------------------------------------------------------------------------
@@ -426,6 +539,21 @@ def main():
     written = {}
     unknown_all = {}
     term_mismatch = []
+    prereq_counts = {}          # program id -> onkosulu dolu ders sayisi
+    prereq_by_faculty = {}      # fakulte -> {"courses": n, "withPrereq": n}
+    prereq_failed = 0
+
+    # robots.txt yalnizca guncel katalogu serbest birakiyor; eski yillarda
+    # detay sayfalari cekilmez.
+    detail_allowed = CATALOG_YEAR == "2025-2026"
+    if not detail_allowed:
+        print(
+            f"UYARI: {CATALOG_YEAR} icin onkosul gecisi atlandi "
+            "(robots.txt yalnizca 2025-2026'ya izin veriyor).",
+            flush=True,
+        )
+
+    pool = concurrent.futures.ThreadPoolExecutor(DETAIL_WORKERS)
 
     for i, prog in enumerate(all_programs, 1):
         pid = prog["id"]
@@ -468,6 +596,29 @@ def main():
             for t in terms
         ) if terms else 0
 
+        # Onkosul gecisi: her dersin detay sayfasi (cache'liyse diskten).
+        if detail_allowed:
+            _, failed = enrich_prerequisites(courses, pool)
+            prereq_failed += failed
+        else:
+            for c in courses:
+                c["prerequisites"] = []
+
+        with_prereq = sum(1 for c in courses if c["prerequisites"])
+        prereq_counts[pid] = with_prereq
+        fac = prereq_by_faculty.setdefault(
+            prog["faculty"], {"courses": 0, "withPrereq": 0, "programs": 0}
+        )
+        fac["courses"] += len(courses)
+        fac["withPrereq"] += with_prereq
+        fac["programs"] += 1
+
+        print(
+            f"  [{i}/{len(all_programs)}] {pid} {prog['name'][:40]}: "
+            f"{len(courses)} ders, {with_prereq} onkosullu",
+            flush=True,
+        )
+
         total_courses += len(courses)
         written[pid] = len(courses)
 
@@ -485,9 +636,9 @@ def main():
                 "courses": courses,
             }, fh, ensure_ascii=False, separators=(",", ":"))
 
-        if i % 25 == 0 or i == len(all_programs):
-            print(f"  {i}/{len(all_programs)} program islendi", flush=True)
         time.sleep(REQUEST_DELAY)
+
+    pool.shutdown()
 
     for prog in all_programs:
         if prog["id"] in written:
@@ -528,6 +679,20 @@ def main():
         )[:20]:
             print(f"    {info['courses']:>5} ders / {len(info['programs'])} program: {title!r}")
 
+    # ---- Onkosul kapsama raporu ----
+    total_with_prereq = sum(prereq_counts.values())
+    print()
+    print(f"Onkosulu dolu ders  : {total_with_prereq} / {total_courses}")
+    if prereq_failed:
+        print(f"Detay sayfasi alinamadi : {prereq_failed} ders (onkosulu bos yazildi)")
+    print("  Fakulte bazinda (sifir cikanlar elle teyit edilmeli):")
+    for fac, info in sorted(prereq_by_faculty.items(), key=lambda x: x[1]["withPrereq"]):
+        mark = "  <-- SIFIR" if info["withPrereq"] == 0 else ""
+        print(
+            f"    {info['withPrereq']:>5} / {info['courses']:>5} ders "
+            f"({info['programs']:>3} program)  {fac}{mark}"
+        )
+
     print()
     print(f"TOPLAM satiriyla uyusmayan donem: {len(term_mismatch)}")
     for row in term_mismatch[:10]:
@@ -539,11 +704,26 @@ def main():
     print("\nRegresyon kontrolu (bagimsiz olarak dogrulanmis ders sayilari):")
     ok = True
     for pid, expected in EXPECTED_COURSE_COUNTS.items():
+        # Tek program testinde (scrape.py <id>) digerleri hic cekilmez;
+        # onlari "fark" saymak testi kullanilamaz hale getirir.
+        if only and pid not in written:
+            continue
         got = written.get(pid)
         mark = "OK " if got == expected else "FARK"
         if got != expected:
             ok = False
         print(f"    {mark} {pid}: beklenen {expected}, cikan {got}")
+
+    if detail_allowed:
+        print("\nRegresyon kontrolu (elle dogrulanmis onkosullu ders sayilari):")
+        for pid, expected in EXPECTED_PREREQ_COUNTS.items():
+            if only and pid not in written:
+                continue
+            got = prereq_counts.get(pid)
+            mark = "OK " if got == expected else "FARK"
+            if got != expected:
+                ok = False
+            print(f"    {mark} {pid}: beklenen {expected}, cikan {got}")
 
     if unknown_all:
         ok = False
