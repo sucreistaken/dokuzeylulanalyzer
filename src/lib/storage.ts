@@ -141,7 +141,7 @@ export function parseImported(raw: string): PersistedState {
         return parsePayload(raw)
     } catch (err) {
         if (err instanceof SyntaxError) {
-            throw new Error('Dosya gecerli bir JSON degil.')
+            throw new Error('Dosya geçerli bir JSON değil.')
         }
         throw err
     }

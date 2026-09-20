@@ -75,7 +75,7 @@ describe('parseImported', () => {
     })
 
     it('bozuk JSON icin anlasilir hata verir', () => {
-        expect(() => parseImported('{bozuk')).toThrow('gecerli bir JSON degil')
+        expect(() => parseImported('{bozuk')).toThrow('geçerli bir JSON değil')
     })
 
     it('bilinmeyen surum icin anlasilir hata verir', () => {

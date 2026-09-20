@@ -281,7 +281,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                 options={programOptions}
                                 loading={loadingProgram}
                                 onChange={(id) => parsed && choose(id, parsed.rows)}
-                                notFoundContent="Eslesen program yok"
+                                notFoundContent="Eşleşen program yok"
                             />
                             <div className="mt-1 text-xs text-gray-500">
                                 {detected
@@ -358,7 +358,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                     <Alert
                                         type="error"
                                         showIcon
-                                        message="Hesap transkriptle ortusmedi, dikkatli olun"
+                                        message="Hesap transkriptle örtüşmedi, dikkatli ol"
                                         description={
                                             `Okunan derslerden GANO ${selfCheck.gpa} (${selfCheck.credits} kredi) ` +
                                             `cikti, transkriptiniz ${parsed.totals?.gpa} (${parsed.totals?.credits} kredi) diyor. ` +
@@ -376,7 +376,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                         description={
                                             'Transkriptte "Kümülatif Ortalaması" satırı bulunamadığı için ' +
                                             'okunan değerler kendi içinde doğrulanamadı. İçe aktardıktan sonra ' +
-                                            'birkac dersin notunu gozden gecirin.'
+                                            'birkaç dersin notunu gözden geçir.'
                                         }
                                     />
                                 )}
@@ -388,7 +388,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                         message="Derslerin çoğu müfredatla eşleşmedi"
                                         description={
                                             'Yanlış program seçili olabilir ya da transkript biçimi farklı ' +
-                                            'okunmus olabilir. Devam etmeden once yukaridan programi ve listeyi kontrol edin.'
+                                            'okunmuş olabilir. Devam etmeden önce yukarıdan programı ve listeyi kontrol et.'
                                         }
                                     />
                                 )}
@@ -464,7 +464,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                             description={
                                 'Dosya hiçbir sunucuya gönderilmez. Kimlik numaran, öğrenci ' +
                                 'numaran ve adın okunmaz ve kaydedilmez; yalnızca ders ' +
-                                'kodlari ve notlar alinir.'
+                                'kodları ve notlar alınır.'
                             }
                         />
                     </div>

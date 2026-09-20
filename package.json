@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "scrape": "python3 tools/scraper/scrape.py",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name=deu-ders-analiz --branch=main --commit-dirty=true"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=deu-ders-analiz --branch=\"Dokuz Eylul Transkript Senaryosu\" --commit-dirty=true"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.0",
