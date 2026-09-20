@@ -91,7 +91,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                 setPlan(buildImportPlan(rows, data.courses))
             })
             .catch((err: Error) => {
-                message.error(`Program mufredati yuklenemedi: ${err.message}`)
+                message.error(`Program müfredatı yüklenemedi: ${err.message}`)
                 setSelectedData(null)
                 setPlan(null)
             })
@@ -109,9 +109,9 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                     const result = parseTranscriptAuto(pages)
                     if (result.rows.length === 0) {
                         message.error(
-                            'PDF icinde ders satiri bulunamadi. DEBIS "Ogrenci Not Durum ' +
-                            'Belgesi" ya da e-Devlet "Not Dokum Belgesi" PDF\'ini ' +
-                            'yuklediginizden emin olun.',
+                            'PDF içinde ders satırı bulunamadı. DEBİS "Öğrenci Not Durum ' +
+                            'Belgesi" ya da e-Devlet "Not Döküm Belgesi" PDF\'ini ' +
+                            'yüklediğinden emin ol.',
                         )
                         return
                     }
@@ -128,15 +128,15 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                     if (initialId) choose(initialId, result.rows)
                 })
                 .catch((err: Error) => {
-                    console.error('Transkript okunamadi:', err)
+                    console.error('Transkript okunamadı:', err)
                     // pdfjs teknik ve Ingilizce hata verir ("Invalid PDF structure.");
                     // ogrenciye anlasilir Turkce karsiligini goster.
                     const name = (err as Error & { name?: string }).name ?? ''
-                    let friendly = 'Dosya okunamadi. Gecerli bir PDF sectiginizden emin olun.'
+                    let friendly = 'Dosya okunamadı. Geçerli bir PDF seçtiğinden emin ol.'
                     if (name === 'PasswordException') {
-                        friendly = 'PDF parola korumali. Parolasiz bir kopya ile deneyin.'
+                        friendly = 'PDF parola korumalı. Parolasız bir kopya ile dene.'
                     } else if (name === 'InvalidPDFException') {
-                        friendly = 'Dosya bozuk veya PDF degil. DEBIS\'ten yeniden indirip deneyin.'
+                        friendly = 'Dosya bozuk veya PDF değil. DEBİS\'ten yeniden indirip dene.'
                     }
                     message.error(friendly)
                 })
@@ -185,15 +185,15 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
 
         const extra = addUnmatched ? plan.unmatched.length : 0
         message.success(
-            `${selectedData.name}: ${plan.matched.length} ders ice aktarildi` +
-            (extra > 0 ? `, ${extra} ders mufredata eklendi` : ''),
+            `${selectedData.name}: ${plan.matched.length} ders içe aktarıldı` +
+            (extra > 0 ? `, ${extra} ders müfredata eklendi` : ''),
         )
         close()
     }
 
     const columns = [
         { title: 'Kod', dataIndex: 'code', key: 'code', width: 110 },
-        { title: 'Ders Adi', dataIndex: 'name', key: 'name', ellipsis: true },
+        { title: 'Ders Adı', dataIndex: 'name', key: 'name', ellipsis: true },
         { title: 'AKTS', dataIndex: 'ects', key: 'ects', width: 70 },
         {
             title: 'Not',
@@ -232,8 +232,8 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                             Transkriptinle basla
                         </div>
                         <div className="text-sm text-gray-600">
-                            DEBIS "Ogrenci Not Durum Belgesi" PDF'ini yukle; programin ve
-                            tum notlarin otomatik gelsin. Dosya yalnizca tarayicinda islenir.
+                            DEBİS "Öğrenci Not Durum Belgesi" PDF'ini yükle; programın ve
+                            tüm notların otomatik gelsin. Dosya yalnızca tarayıcında işlenir.
                         </div>
                     </div>
                 </div>
@@ -260,8 +260,8 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                 open={parsed !== null}
                 onCancel={close}
                 onOk={confirm}
-                okText="Ice Aktar"
-                cancelText="Vazgec"
+                okText="İçe Aktar"
+                cancelText="Vazgeç"
                 okButtonProps={{ disabled: !plan || !selectedData || loadingProgram }}
                 width={860}
             >
@@ -276,7 +276,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                 className="w-full"
                                 showSearch
                                 optionFilterProp="label"
-                                placeholder="Program secin"
+                                placeholder="Program seç"
                                 value={selectedId}
                                 options={programOptions}
                                 loading={loadingProgram}
@@ -287,8 +287,8 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                 {detected
                                     ? `Transkriptten algilandi: "${parsed.program ?? '-'}". Yanlissa yukaridan degistirin.`
                                     : parsed.program
-                                        ? `Transkriptteki program ("${parsed.program}") katalogla eslestirilemedi, lutfen elle secin.`
-                                        : 'Transkriptte program adi okunamadi, lutfen elle secin.'}
+                                        ? `Transkriptteki program ("${parsed.program}") katalogla eşleştirilemedi, lütfen elle seç.`
+                                        : 'Transkriptte program adı okunamadı, lütfen elle seç.'}
                             </div>
                         </div>
 
@@ -298,19 +298,19 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                 value={replaceMode}
                                 onChange={(e) => setReplaceMode(e.target.value)}
                             >
-                                <Radio value={true}>Mevcut notlarin uzerine yaz (temiz)</Radio>
+                                <Radio value={true}>Mevcut notların üzerine yaz (temiz)</Radio>
                                 <Radio value={false}>Mevcut notlarla birlestir</Radio>
                             </Radio.Group>
                             <div className="mt-1 text-xs text-gray-500">
                                 {replaceMode
-                                    ? 'Bu programdaki eski notlar ve onceki transkriptten eklenen dersler once temizlenir, sonra bu transkript yazilir. Iki transkript karismaz.'
-                                    : 'Bu transkript mevcut notlarin uzerine eklenir; dokunulmayan dersler oldugu gibi kalir.'}
+                                    ? 'Bu programdaki eski notlar ve önceki transkriptten eklenen dersler önce temizlenir, sonra bu transkript yazilir. Iki transkript karismaz.'
+                                    : 'Bu transkript mevcut notların üzerine eklenir; dokunulmayan dersler olduğu gibi kalır.'}
                             </div>
                         </div>
 
                         {loadingProgram && (
                             <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <Spin size="small" /> Program mufredati yukleniyor...
+                                <Spin size="small" /> Program müfredatı yükleniyor...
                             </div>
                         )}
 
@@ -318,8 +318,8 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                             <>
                                 <div className="flex flex-wrap gap-6">
                                     <Statistic title="Bulunan Ders" value={parsed.rows.length} />
-                                    <Statistic title="Mufredatta" value={direct.length} />
-                                    <Statistic title="Secmeli Havuzunda" value={fromPool.length} />
+                                    <Statistic title="Müfredatta" value={direct.length} />
+                                    <Statistic title="Seçmeli Havuzunda" value={fromPool.length} />
                                     <Statistic
                                         title="Eslesmeyen"
                                         value={plan.unmatched.length}
@@ -332,7 +332,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                 {expected && (
                                     <div className="flex flex-wrap gap-6 rounded-lg bg-gray-50 p-3">
                                         <Statistic
-                                            title="Ice aktarim sonrasi GANO"
+                                            title="İçe aktarım sonrası GANO"
                                             value={expected.gpa}
                                             precision={2}
                                             valueStyle={{ color: '#3f8600' }}
@@ -344,7 +344,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                                 precision={2}
                                             />
                                         )}
-                                        <Statistic title="Kazanilan AKTS" value={expected.ects} />
+                                        <Statistic title="Kazanılan AKTS" value={expected.ects} />
                                     </div>
                                 )}
 
@@ -362,8 +362,8 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                         description={
                                             `Okunan derslerden GANO ${selfCheck.gpa} (${selfCheck.credits} kredi) ` +
                                             `cikti, transkriptiniz ${parsed.totals?.gpa} (${parsed.totals?.credits} kredi) diyor. ` +
-                                            'Transkript bicimi beklenenden farkli olabilir; ice aktardiktan sonra ' +
-                                            'notlarinizi mutlaka kontrol edin.'
+                                            'Transkript biçimi beklenenden farklı olabilir; içe aktardıktan sonra ' +
+                                            'notlarını mutlaka kontrol et.'
                                         }
                                     />
                                 )}
@@ -372,10 +372,10 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                     <Alert
                                         type="warning"
                                         showIcon
-                                        message="Otomatik dogrulama yapilamadi"
+                                        message="Otomatik doğrulama yapılamadı"
                                         description={
-                                            'Transkriptte "Kumulatif Ortalamasi" satiri bulunamadigi icin ' +
-                                            'okunan degerler kendi icinde dogrulanamadi. Ice aktardiktan sonra ' +
+                                            'Transkriptte "Kümülatif Ortalaması" satırı bulunamadığı için ' +
+                                            'okunan değerler kendi içinde doğrulanamadı. İçe aktardıktan sonra ' +
                                             'birkac dersin notunu gozden gecirin.'
                                         }
                                     />
@@ -385,9 +385,9 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                     <Alert
                                         type="warning"
                                         showIcon
-                                        message="Derslerin cogu mufredatla eslesmedi"
+                                        message="Derslerin çoğu müfredatla eşleşmedi"
                                         description={
-                                            'Yanlis program secili olabilir ya da transkript bicimi farkli ' +
+                                            'Yanlış program seçili olabilir ya da transkript biçimi farklı ' +
                                             'okunmus olabilir. Devam etmeden once yukaridan programi ve listeyi kontrol edin.'
                                         }
                                     />
@@ -402,7 +402,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                     items={[
                                         {
                                             key: 'matched',
-                                            label: `Mufredatta (${direct.length})`,
+                                            label: `Müfredatta (${direct.length})`,
                                             children: (
                                                 <Table
                                                     size="small"
@@ -414,12 +414,12 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                         },
                                         {
                                             key: 'pool',
-                                            label: `Secmeli (${fromPool.length})`,
+                                            label: `Seçmeli (${fromPool.length})`,
                                             children: (
                                                 <>
                                                     <div className="mb-2 text-xs text-gray-500">
-                                                        Bu dersler secmeli havuzunuzda bulundu ve
-                                                        mufredatiniza otomatik eklenecek.
+                                                        Bu dersler seçmeli havuzunda bulundu ve
+                                                        müfredatına otomatik eklenecek.
                                                     </div>
                                                     <Table
                                                         size="small"
@@ -440,7 +440,7 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                                                         onChange={(e) => setAddUnmatched(e.target.checked)}
                                                         disabled={plan.unmatched.length === 0}
                                                     >
-                                                        Bu dersleri mufredatima ekle
+                                                        Bu dersleri müfredatıma ekle
                                                     </Checkbox>
                                                     <Table
                                                         className="mt-2"
@@ -460,10 +460,10 @@ const TranscriptImport: React.FC<Props> = ({ variant = 'button' }) => {
                         <Alert
                             type="success"
                             showIcon
-                            message="PDF'iniz yalnizca tarayicinizda islenir"
+                            message="PDF'iniz yalnızca tarayıcında işlenir"
                             description={
-                                'Dosya hicbir sunucuya gonderilmez. Kimlik numaraniz, ogrenci ' +
-                                'numaraniz ve adiniz okunmaz ve kaydedilmez; yalnizca ders ' +
+                                'Dosya hiçbir sunucuya gönderilmez. Kimlik numaran, öğrenci ' +
+                                'numaran ve adın okunmaz ve kaydedilmez; yalnızca ders ' +
                                 'kodlari ve notlar alinir.'
                             }
                         />

@@ -86,7 +86,7 @@ function parsePayload(raw: string): PersistedState {
     if (parsed.schemaVersion === SCHEMA_VERSION) {
         const state = (parsed as PersistedV2).state
         if (!state || typeof state.progress !== 'object' || state.progress === null) {
-            throw new Error('Dosya beklenen yapiyi tasimiyor.')
+            throw new Error('Dosya beklenen yapıyı taşımıyor.')
         }
         return { activeProgramId: state.activeProgramId ?? null, progress: state.progress }
     }
@@ -103,7 +103,7 @@ export function loadState(): PersistedState | null {
         if (!raw) return null
         return parsePayload(raw)
     } catch (err) {
-        console.error('Kayitli veri okunamadi:', err)
+        console.error('Kayıtlı veri okunamadı:', err)
         return null
     }
 }

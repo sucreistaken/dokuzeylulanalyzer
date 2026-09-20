@@ -30,7 +30,7 @@ export const GRADE_POINTS: Record<string, number> = {
  * Bunlarin kredisi ortalama paydasina yazilmaz ama AKTS'si sayilabilir.
  */
 export const NON_GPA_GRADES: Record<string, string> = {
-    B: 'Basarili',
+    B: 'Başarılı',
     M: 'Muaf',
     Y: 'Yetersiz',
     D: 'Devamsiz',
@@ -168,7 +168,7 @@ export function calculateStats(
  * Yalnizca bilgilendirme amacli gosterilir.
  */
 export function honorLabel(gpa: number): string | null {
-    if (gpa >= 3.5) return 'Yuksek Onur'
+    if (gpa >= 3.5) return 'Yüksek Onur'
     if (gpa >= 3.0) return 'Onur'
     return null
 }

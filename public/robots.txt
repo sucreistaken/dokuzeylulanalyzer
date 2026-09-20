@@ -1,0 +1,9 @@
+# deu.kadiray.com, dokuzeylul.net/ders-analizi sayfasindaki aracin arka ucudur.
+# Taramaya izin veriyoruz ki arama motorlari sayfadaki
+# <meta name="robots" content="noindex"> etiketini gorebilsin;
+# Disallow verseydik etiketi hic okuyamazlardi.
+User-agent: *
+Allow: /
+
+# Katalog JSON'lari arama sonucunda isimize yaramaz.
+Disallow: /data/

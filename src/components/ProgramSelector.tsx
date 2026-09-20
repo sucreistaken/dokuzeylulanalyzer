@@ -98,7 +98,7 @@ const ProgramSelector: React.FC = () => {
         if (!pendingRemoval) return
         const removed = programs.find((p) => p.id === pendingRemoval)
         dispatch(removeProgram(pendingRemoval))
-        message.success(`${removed?.name ?? 'Program'} kaldirildi`)
+        message.success(`${removed?.name ?? 'Program'} kaldırıldı`)
         setPendingRemoval(null)
     }
 
@@ -107,7 +107,7 @@ const ProgramSelector: React.FC = () => {
             <Alert
                 type="error"
                 showIcon
-                message="Katalog yuklenemedi"
+                message="Katalog yüklenemedi"
                 description={indexError}
             />
         )
@@ -117,7 +117,7 @@ const ProgramSelector: React.FC = () => {
         return (
             <div className="flex flex-col items-center gap-3 py-8">
                 <Spin />
-                <span className="text-sm text-gray-500">Katalog yukleniyor...</span>
+                <span className="text-sm text-gray-500">Katalog yükleniyor...</span>
             </div>
         )
     }
@@ -128,10 +128,10 @@ const ProgramSelector: React.FC = () => {
         <div className="space-y-4">
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={6}>
-                    <div className="mb-1 text-sm text-gray-600">Ogrenim duzeyi</div>
+                    <div className="mb-1 text-sm text-gray-600">Öğrenim düzeyi</div>
                     <Select
                         className="w-full"
-                        placeholder="Duzey secin"
+                        placeholder="Düzey seç"
                         value={level}
                         options={levels}
                         onChange={(value) => {
@@ -141,10 +141,10 @@ const ProgramSelector: React.FC = () => {
                     />
                 </Col>
                 <Col xs={24} md={8}>
-                    <div className="mb-1 text-sm text-gray-600">Fakulte / Yuksekokul</div>
+                    <div className="mb-1 text-sm text-gray-600">Fakülte / Yüksekokul</div>
                     <Select
                         className="w-full"
-                        placeholder="Tumu"
+                        placeholder="Tümü"
                         value={faculty}
                         allowClear
                         showSearch
@@ -158,7 +158,7 @@ const ProgramSelector: React.FC = () => {
                     <div className="mb-1 text-sm text-gray-600">Program</div>
                     <Select
                         className="w-full"
-                        placeholder="Program adi yazarak arayin"
+                        placeholder="Program adı yazarak ara"
                         value={null}
                         showSearch
                         optionFilterProp="label"
@@ -174,7 +174,7 @@ const ProgramSelector: React.FC = () => {
             {programs.length > 0 && (
                 <div>
                     <div className="mb-2 text-sm text-gray-600">
-                        Eklenen programlar (gecis yapmak icin tiklayin)
+                        Eklenen programlar (geçiş yapmak için tıkla)
                     </div>
                     <Space size={[0, 8]} wrap>
                         {programs.map((p) => (
@@ -201,22 +201,22 @@ const ProgramSelector: React.FC = () => {
 
             <Card size="small" className="bg-gray-50">
                 <div className="text-xs text-gray-500">
-                    Veri kaynagi: DEU Ders Katalogu {index.catalogYear}. Notlariniz yalnizca
-                    bu tarayicida saklanir, sunucuya gonderilmez.
+                    Veri kaynağı: DEÜ Ders Kataloğu {index.catalogYear}. Notların yalnızca
+                    bu tarayıcıda saklanır, sunucuya gönderilmez.
                 </div>
             </Card>
 
             <Modal
-                title="Programi kaldir"
+                title="Programı kaldır"
                 open={pendingRemoval !== null}
                 onOk={confirmRemoval}
                 onCancel={() => setPendingRemoval(null)}
-                okText="Kaldir"
-                cancelText="Vazgec"
+                okText="Kaldır"
+                cancelText="Vazgeç"
                 okButtonProps={{ danger: true }}
             >
                 <p>
-                    {pendingProgram?.name} programini kaldirmak istediginize emin misiniz?
+                    {pendingProgram?.name} programını kaldırmak istediğine emin misin?
                     Bu programa girdiginiz tum notlar silinir ve geri alinamaz.
                 </p>
             </Modal>

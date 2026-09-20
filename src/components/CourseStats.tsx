@@ -29,9 +29,9 @@ const CourseStats: React.FC = () => {
                 icon: <TrophyOutlined />,
                 color: '#3f8600',
                 tooltip:
-                    'Genel not ortalamasi. Yerel kredi ile agirliklandirilir: ' +
-                    'Toplam(kredi x katsayi) / Toplam(kredi). ' +
-                    'B, M, Y, D, E notlari ortalamaya girmez.',
+                    'Genel not ortalaması. Yerel kredi ile ağırlıklandırılır: ' +
+                    'Toplam(kredi x katsayı) / Toplam(kredi). ' +
+                    'B, M, Y, D, E notları ortalamaya girmez.',
             },
             {
                 title: 'Ortalamaya Giren Kredi',
@@ -39,71 +39,71 @@ const CourseStats: React.FC = () => {
                 icon: <CheckSquareOutlined />,
                 color: '#3f8600',
                 tooltip:
-                    'Harf notu alinmis derslerin kredi toplami. Transkriptteki "Toplam Kredi".',
+                    'Harf notu alınmış derslerin kredi toplamı. Transkriptteki "Toplam Kredi".',
             },
             {
-                title: 'Mufredat Kredisi',
+                title: 'Müfredat Kredisi',
                 value: stats.totalCredits,
                 icon: <BookOutlined />,
                 tooltip:
-                    'Programdaki tum derslerin kredi toplami. Kredi = T + (U + L) / 2.',
+                    'Programdaki tüm derslerin kredi toplamı. Kredi = T + (U + L) / 2.',
             },
             {
-                title: 'Kazanilan AKTS',
+                title: 'Kazanılan AKTS',
                 value: stats.earnedEcts,
                 suffix: `/ ${stats.totalEcts}`,
                 icon: <CheckCircleOutlined />,
                 color: '#096dd9',
                 tooltip:
-                    'Basariyla tamamlanan derslerin AKTS toplami. Payda katalogun ' +
-                    'resmi mezuniyet hedefidir (lisansta genelde 240).',
+                    'Başarıyla tamamlanan derslerin AKTS toplamı. Payda kataloğun ' +
+                    'resmî mezuniyet hedefidir (lisansta genelde 240).',
             },
             {
-                title: 'Secilmemis AKTS',
+                title: 'Seçilmemiş AKTS',
                 value: stats.missingElectiveEcts,
                 icon: <ExceptionOutlined />,
                 color: stats.missingElectiveEcts > 0 ? '#d46b08' : '#3f8600',
                 tooltip:
-                    'Mezuniyet hedefi ile planiniza aldiginiz dersler arasindaki fark. ' +
-                    'Eksikse ilgili donemlerden secmeli ders secmelisiniz.',
+                    'Mezuniyet hedefi ile planına aldığın dersler arasındaki fark. ' +
+                    'Eksikse ilgili dönemlerden seçmeli ders seçmelisin.',
             },
             {
-                title: 'Gecilen Ders',
+                title: 'Geçilen Ders',
                 value: stats.passedCourses,
                 icon: <CheckCircleOutlined />,
                 color: '#3f8600',
-                tooltip: 'Basariyla tamamlanan ders sayisi (B ve M dahil).',
+                tooltip: 'Başarıyla tamamlanan ders sayısı (B ve M dahil).',
             },
             {
-                title: 'Kalinan Ders',
+                title: 'Kalınan Ders',
                 value: stats.failedCourses,
                 icon: <CloseCircleOutlined />,
                 color: '#cf1322',
-                tooltip: 'FD, FF, Y veya D notu alinan ders sayisi.',
+                tooltip: 'FD, FF, Y veya D notu alınan ders sayısı.',
             },
             {
-                title: 'Alinan Ders',
+                title: 'Alınan Ders',
                 value: stats.activeCourses,
                 icon: <HourglassOutlined />,
                 color: '#d46b08',
-                tooltip: 'Su anda devam edilen ders sayisi.',
+                tooltip: 'Şu anda devam edilen ders sayısı.',
             },
             {
                 title: 'Kalan Ders',
                 value: stats.remainingCourses,
                 icon: <ExceptionOutlined />,
                 color: '#eb2f96',
-                tooltip: 'Henuz alinmamis ders sayisi.',
+                tooltip: 'Henüz alınmamış ders sayısı.',
             },
             {
-                title: 'Basari Orani',
+                title: 'Başarı Oranı',
                 value: stats.successRate,
                 precision: 1,
                 suffix: '%',
                 icon: <PercentageOutlined />,
                 color: '#1890ff',
                 tooltip:
-                    'Gecilen / (gecilen + kalinan). Hic ders tamamlanmadiysa 0 gosterilir.',
+                    'Geçilen / (geçilen + kalınan). Hiç ders tamamlanmadıysa 0 gösterilir.',
             },
         ],
         [stats],

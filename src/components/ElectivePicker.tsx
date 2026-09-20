@@ -63,7 +63,7 @@ const ElectivePicker: React.FC<Props> = ({
 
         return [
             ...termPool.filter(match).map((c) => ({ ...c, group: termLabel })),
-            ...anyTermPool.filter(match).map((c) => ({ ...c, group: 'Her donem alinabilir' })),
+            ...anyTermPool.filter(match).map((c) => ({ ...c, group: 'Her dönem alınabilir' })),
         ]
     }, [termPool, anyTermPool, search, termLabel])
 
@@ -83,7 +83,7 @@ const ElectivePicker: React.FC<Props> = ({
     const columns = [
         { title: 'Kod', dataIndex: 'code', key: 'code', width: 110 },
         {
-            title: 'Ders Adi',
+            title: 'Ders Adı',
             dataIndex: 'name',
             key: 'name',
             render: (name: string) => (
@@ -120,7 +120,7 @@ const ElectivePicker: React.FC<Props> = ({
 
     return (
         <Modal
-            title={`${termLabel} - Secmeli Ders Sec`}
+            title={`${termLabel} - Seçmeli Ders Seç`}
             open={open}
             width={980}
             onCancel={() => {
@@ -132,13 +132,13 @@ const ElectivePicker: React.FC<Props> = ({
                 close()
             }}
             okText={checked.length > 0 ? `${checked.length} dersi ekle` : 'Ekle'}
-            cancelText="Vazgec"
+            cancelText="Vazgeç"
             okButtonProps={{ disabled: checked.length === 0 }}
         >
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                 <Input.Search
                     allowClear
-                    placeholder="Ders kodu veya adi ara"
+                    placeholder="Ders kodu veya adı ara"
                     className="max-w-sm"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -154,8 +154,8 @@ const ElectivePicker: React.FC<Props> = ({
                 <Empty
                     description={
                         search
-                            ? 'Aramayla eslesen ders yok'
-                            : 'Bu donemde secilebilecek ders kalmadi'
+                            ? 'Aramayla eşleşen ders yok'
+                            : 'Bu dönemde seçilebilecek ders kalmadı'
                     }
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />

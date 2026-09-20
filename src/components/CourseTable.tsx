@@ -118,6 +118,10 @@ const CourseTable: React.FC = () => {
             if (!map.has(t.term)) map.set(t.term, [])
         }
 
+        // Katalog verisi 'Donem'/'Yil' degerlerini ASCII tutuyor; ekranda
+        // gosterirken Turkcelestiriyoruz, veri degerine dokunmuyoruz.
+        const unitLabel = (u: string) => (u === 'Donem' ? 'Dönem' : u === 'Yil' ? 'Yıl' : u)
+
         const unitFor = (term: number | null) =>
             included.find((c) => c.term === term)?.termUnit ??
             active?.terms.find((t) => t.term === term)?.unit ??
@@ -126,7 +130,7 @@ const CourseTable: React.FC = () => {
         return [...map.entries()]
             .map(([term, list]) => ({
                 term,
-                label: term === null ? 'Tum Dersler' : `${term}. ${unitFor(term)}`,
+                label: term === null ? 'Tüm Dersler' : `${term}. ${unitLabel(unitFor(term))}`,
                 courses: list,
             }))
             .sort((a, b) => {
@@ -149,7 +153,7 @@ const CourseTable: React.FC = () => {
         (ids: string[]) => {
             for (const id of ids) dispatch(toggleElective(id))
             setPickerTerm(undefined)
-            message.success(`${ids.length} secmeli ders eklendi`)
+            message.success(`${ids.length} seçmeli ders eklendi`)
         },
         [dispatch],
     )
@@ -171,10 +175,10 @@ const CourseTable: React.FC = () => {
     const handleRemove = useCallback(
         (course: Course) => {
             Modal.confirm({
-                title: 'Dersi kaldir',
-                content: `${course.code} - ${course.name} mufredattan kaldirilsin mi?`,
+                title: 'Dersi kaldır',
+                content: `${course.code} - ${course.name} müfredattan kaldırılsın mı?`,
                 okText: 'Kaldir',
-                cancelText: 'Vazgec',
+                cancelText: 'Vazgeç',
                 okButtonProps: { danger: true },
                 onOk: () => {
                     if (course.elective || course.id.includes(':custom:')) {
@@ -186,7 +190,7 @@ const CourseTable: React.FC = () => {
                     } else {
                         dispatch(removeCourse(course.id))
                     }
-                    message.success('Ders kaldirildi')
+                    message.success('Ders kaldırıldı')
                 },
             })
         },
@@ -196,7 +200,7 @@ const CourseTable: React.FC = () => {
     const handleExportCsv = useCallback(() => {
         if (!active) return
         const header = [
-            'Kod', 'Ders Adi', 'T', 'U', 'L', 'Kredi', 'AKTS', 'Tur', 'Donem', 'Not', 'Durum',
+            'Kod', 'Ders Adı', 'T', 'U', 'L', 'Kredi', 'AKTS', 'Tür', 'Dönem', 'Not', 'Durum',
         ]
         const rows = included.map((c) => [
             c.code,
@@ -207,7 +211,7 @@ const CourseTable: React.FC = () => {
             c.credit,
             c.ects,
             prettyType(c.rawType),
-            c.term === null ? '-' : `${c.term}. ${c.termUnit ?? 'Donem'}`,
+            c.term === null ? '-' : `${c.term}. ${c.termUnit === 'Yil' ? 'Yıl' : 'Dönem'}`,
             c.grade === 'NA' ? '' : c.grade,
             STATUS_LABEL[c.status],
         ])
@@ -259,7 +263,7 @@ const CourseTable: React.FC = () => {
                             programs: loaded.filter((p): p is ProgramData => p !== null),
                         }),
                     )
-                    message.success('Yedek geri yuklendi')
+                    message.success('Yedek geri yüklendi')
                 } catch (err) {
                     message.error((err as Error).message)
                 }
@@ -293,7 +297,7 @@ const CourseTable: React.FC = () => {
         () => [
             { title: 'Kod', dataIndex: 'code', key: 'code', width: 110 },
             {
-                title: 'Ders Adi',
+                title: 'Ders Adı',
                 dataIndex: 'name',
                 key: 'name',
                 width: 320,
@@ -390,7 +394,7 @@ const CourseTable: React.FC = () => {
     if (!active) {
         return (
             <Empty
-                description="Once yukaridan bir program secin"
+                description="Önce yukarıdan bir program seç"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
         )
@@ -427,9 +431,9 @@ const CourseTable: React.FC = () => {
                             Modal.confirm({
                                 title: 'Notlari sifirla',
                                 content:
-                                    'Bu programdaki tum not ve durumlar silinecek. Devam edilsin mi?',
+                                    'Bu programdaki tüm not ve durumlar silinecek. Devam edilsin mi?',
                                 okText: 'Sifirla',
-                                cancelText: 'Vazgec',
+                                cancelText: 'Vazgeç',
                                 okButtonProps: { danger: true },
                                 onOk: () => {
                                     dispatch(resetProgress())
@@ -466,9 +470,9 @@ const CourseTable: React.FC = () => {
                                         {groupCourses.reduce((s, c) => s + c.ects, 0)} AKTS
                                         {req?.totalEcts ? ` / ${req.totalEcts}` : ''}
                                     </Tag>
-                                    <Tooltip title="Bu donemde harf notu alinmis derslerin agirlikli ortalamasi">
+                                    <Tooltip title="Bu dönemde harf notu alınmış derslerin ağırlıklı ortalaması">
                                         <Tag icon={<TrophyOutlined />} color={credits > 0 ? 'success' : 'default'}>
-                                            Donem Ortalamasi: {credits > 0 ? gpa.toFixed(2) : '-'}
+                                            Dönem Ortalaması: {credits > 0 ? gpa.toFixed(2) : '-'}
                                         </Tag>
                                     </Tooltip>
                                 </Space>
@@ -506,12 +510,12 @@ const CourseTable: React.FC = () => {
                                     <div className="text-sm">
                                         {target !== null ? (
                                             <span className={done ? 'text-green-800' : 'text-orange-800'}>
-                                                <strong>Secmeli: {chosen} / {target} AKTS</strong>
-                                                {!done && ' - bu donemde secmeli dersinizi secmelisiniz'}
+                                                <strong>Seçmeli: {chosen} / {target} AKTS</strong>
+                                                {!done && ' - bu dönemde seçmeli dersini seçmelisin'}
                                             </span>
                                         ) : (
                                             <span className="text-gray-600">
-                                                Bu donemde secilebilecek {poolForTerm.length + anyTermPool.length} ders var
+                                                Bu dönemde seçilebilecek {poolForTerm.length + anyTermPool.length} ders var
                                                 {chosen > 0 && ` (${chosen} AKTS secildi)`}
                                             </span>
                                         )}
@@ -522,7 +526,7 @@ const CourseTable: React.FC = () => {
                                         icon={<PlusOutlined />}
                                         onClick={() => setPickerTerm(term)}
                                     >
-                                        Secmeli Ders Ekle
+                                        Seçmeli Ders Ekle
                                     </Button>
                                 </div>
                             )}
@@ -535,7 +539,7 @@ const CourseTable: React.FC = () => {
                 <ElectivePicker
                     open
                     termLabel={
-                        groups.find((g) => g.term === pickerTerm)?.label ?? 'Secmeli'
+                        groups.find((g) => g.term === pickerTerm)?.label ?? 'Seçmeli'
                     }
                     termPool={electivePool.filter(
                         (c) => c.term === pickerTerm && c.poolScope !== 'any',
@@ -560,7 +564,7 @@ const CourseTable: React.FC = () => {
                     form.resetFields()
                 }}
                 okText="Ekle"
-                cancelText="Vazgec"
+                cancelText="Vazgeç"
             >
                 <Form form={form} layout="vertical">
                     <Form.Item
@@ -572,8 +576,8 @@ const CourseTable: React.FC = () => {
                     </Form.Item>
                     <Form.Item
                         name="name"
-                        label="Ders Adi"
-                        rules={[{ required: true, message: 'Ders adi zorunlu' }]}
+                        label="Ders Adı"
+                        rules={[{ required: true, message: 'Ders adı zorunlu' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -599,7 +603,7 @@ const CourseTable: React.FC = () => {
                     <Form.Item name="term" label="Donem">
                         <Select
                             allowClear
-                            placeholder="Donem secin"
+                            placeholder="Dönem seç"
                             options={groups
                                 .filter((g) => g.term !== null)
                                 .map((g) => ({ value: g.term as number, label: g.label }))}

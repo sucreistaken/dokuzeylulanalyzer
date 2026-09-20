@@ -19,9 +19,9 @@ import {
 import type { Course, RootState } from '../types'
 
 const BLOCKER_LABEL: Record<Blocker['kind'], string> = {
-    PREREQ_FAILED: 'On kosuldan kaldin',
-    PREREQ_MISSING: 'On kosulu almadin',
-    GPA_FLOOR: 'GNO baraji',
+    PREREQ_FAILED: 'Ön koşuldan kaldın',
+    PREREQ_MISSING: 'Ön koşulu almadın',
+    GPA_FLOOR: 'GNO barajı',
 }
 
 /**
@@ -93,7 +93,7 @@ const PrereqImpact: React.FC = () => {
 
     if (!active) {
         return (
-            <Empty description="Once transkriptini yukle ya da programini sec." />
+            <Empty description="Önce transkriptini yükle ya da programını seç." />
         )
     }
 
@@ -102,12 +102,12 @@ const PrereqImpact: React.FC = () => {
             <Alert
                 type="info"
                 showIcon
-                message="Bu programda katalogda tanimli on kosul yok"
+                message="Bu programda katalogda tanımlı ön koşul yok"
                 description={
-                    'DEU Ders Katalogu bu programin hicbir dersinde "Dersin On Kosulu" ' +
-                    'alanini doldurmamis. Bu, fakultenin kendi ogretim ve sinav ' +
-                    'uygulama esaslarinda bir kosul olmadigi anlamina gelmez; ' +
-                    'emin olmak icin danismanina sor.'
+                    'DEÜ Ders Kataloğu bu programın hiçbir dersinde "Dersin Ön Koşulu" ' +
+                    'alanını doldurmamış. Bu, fakültenin kendi öğretim ve sınav ' +
+                    'uygulama esaslarında bir koşul olmadığı anlamına gelmez; ' +
+                    'emin olmak için danışmanına sor.'
                 }
             />
         )
@@ -129,7 +129,7 @@ const PrereqImpact: React.FC = () => {
                     allowClear
                     optionFilterProp="label"
                     className="w-full md:w-[420px]"
-                    placeholder="Kalmayi merak ettigin dersi sec"
+                    placeholder="Kalmayı merak ettiğin dersi seç"
                     options={options}
                     value={selected}
                     onChange={(v) => setSelected(v ?? null)}
@@ -148,10 +148,10 @@ const PrereqImpact: React.FC = () => {
                                     title="Kilitlenen ders"
                                     value={impact.locked.length}
                                 />
-                                <Statistic title="Zincir derinligi" value={impact.depth} />
+                                <Statistic title="Zincir derinliği" value={impact.depth} />
                                 {impact.lastTerm !== null && (
                                     <Statistic
-                                        title="En gec etkilenen yariyil"
+                                        title="En geç etkilenen yarıyıl"
                                         value={impact.lastTerm}
                                     />
                                 )}
@@ -177,10 +177,10 @@ const PrereqImpact: React.FC = () => {
                     <Alert
                         type="success"
                         showIcon
-                        message="On kosul tarafinda bilinen bir engel yok."
+                        message="Ön koşul tarafında bilinen bir engel yok."
                         description={
                             'Kontenjan, ders cakismasi ve danisman onayi burada ' +
-                            'hesaplanmaz; kesin bilgi icin kayit ekranini esas al.'
+                            'hesaplanmaz; kesin bilgi için kayıt ekranını esas al.'
                         }
                     />
                 ) : (

@@ -14,6 +14,7 @@ import CourseTable from './components/CourseTable'
 import PrereqImpact from './components/PrereqImpact'
 import TranscriptImport from './components/TranscriptImport'
 import SummaryBar from './components/SummaryBar'
+import { isEmbedded, reportHeightToParent } from './lib/embed'
 
 const { Header, Content, Footer } = Layout
 const { Title } = Typography
@@ -40,7 +41,7 @@ const AppContent: React.FC = () => {
                     loadProgram(id).catch((err: Error) => {
                         // Katalogdan kalkan program kullanicinin verisini
                         // engellememelidir; atlanir ve bildirilir.
-                        console.warn(`Program ${id} yuklenemedi, atlandi:`, err.message)
+                        console.warn(`Program ${id} yüklenemedi, atlandı:`, err.message)
                         return null
                     }),
                 ),
@@ -63,7 +64,7 @@ const AppContent: React.FC = () => {
         return (
             <div className="flex h-screen flex-col items-center justify-center gap-3">
                 <Spin size="large" />
-                <span className="text-sm text-gray-500">Verileriniz yukleniyor...</span>
+                <span className="text-sm text-gray-500">Verileriniz yükleniyor...</span>
             </div>
         )
     }
@@ -77,52 +78,73 @@ const Home: React.FC = () => (
         {/* Ana giris noktasi: transkript yukle, program ve notlar otomatik gelsin. */}
         <TranscriptImport variant="hero" />
 
-        <Card title="Program Secimi" className="shadow">
+        <Card title="Program Seçimi" className="shadow">
             <div className="mb-3 text-sm text-gray-500">
-                Transkriptin yoksa ya da programini elle secmek istersen buradan sec.
+                Transkriptin yoksa ya da programını elle seçmek istersen buradan seç.
             </div>
             <ProgramSelector />
         </Card>
-        <Card title="Istatistikler" className="shadow">
+        <Card title="İstatistikler" className="shadow">
             <CourseStats />
         </Card>
-        <Card title="On Kosul Etkisi" className="shadow">
+        <Card title="Ön Koşul Etkisi" className="shadow">
             <PrereqImpact />
         </Card>
-        <Card title="Ders Plani" className="shadow">
+        <Card title="Ders Planı" className="shadow">
             <CourseTable />
         </Card>
     </div>
 )
 
 /** Her rotanin paylastigi baslik, alt bilgi ve ozet cubugu. */
-const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <Layout className="min-h-screen">
-        <Header className="flex items-center justify-between bg-gray-50 shadow">
-            <div className="flex items-center">
-                <BarChartOutlined style={{ fontSize: 24, marginRight: 10 }} />
-                <Title level={3} className="m-3 py-4">
-                    DEU Ders Analiz
-                </Title>
-            </div>
-            <div className="hidden text-sm text-gray-500 sm:block">
-                Dokuz Eylul Universitesi
-            </div>
-        </Header>
+const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const embedded = isEmbedded()
 
-        <Content className="bg-[#F0F2F5] p-4 pb-20 md:p-6 md:pb-20">
-            <div className="mx-auto max-w-6xl">{children}</div>
-        </Content>
+    useEffect(() => reportHeightToParent(), [])
 
-        <Footer className="bg-[#F0F2F5] pb-16 text-center text-xs text-gray-500">
-            Ders verileri DEU Ders Katalogu / Bilgi Paketi'nden alinmistir. Resmi bir
-            DEU uygulamasi degildir; notlariniz yalnizca bu tarayicida saklanir.
-            Kesin bilgi icin transkriptinizi esas alin.
-        </Footer>
+    return (
+        <Layout className="min-h-screen">
+            {/* Forum icinde kendi basligi zaten var; ikinci basligi tekrarlamiyoruz. */}
+            {!embedded && (
+                <Header className="flex items-center justify-between bg-gray-50 shadow">
+                    <div className="flex items-center">
+                        <BarChartOutlined style={{ fontSize: 24, marginRight: 10 }} />
+                        <Title level={3} className="m-3 py-4">
+                            DEÜ Ders Analiz
+                        </Title>
+                    </div>
+                    <div className="hidden text-sm text-gray-500 sm:block">
+                        Dokuz Eylül Üniversitesi
+                    </div>
+                </Header>
+            )}
 
-        <SummaryBar />
-    </Layout>
-)
+            <Content
+                className={
+                    embedded
+                        ? 'bg-[#F0F2F5] p-4 pb-6 md:p-6 md:pb-8 lg:pl-[184px]'
+                        : 'bg-[#F0F2F5] p-4 pb-20 md:p-6 md:pb-20'
+                }
+            >
+                <div className="mx-auto max-w-6xl">{children}</div>
+            </Content>
+
+            <Footer
+                className={
+                    embedded
+                        ? 'bg-[#F0F2F5] pb-4 text-center text-xs text-gray-500 lg:pl-[184px]'
+                        : 'bg-[#F0F2F5] pb-16 text-center text-xs text-gray-500'
+                }
+            >
+                Ders verileri DEÜ Ders Kataloğu / Bilgi Paketi'nden alınmıştır. Resmî bir
+                DEÜ uygulaması değildir; notlarınız yalnızca bu tarayıcıda saklanır.
+                Kesin bilgi için transkriptinizi esas alın.
+            </Footer>
+
+            <SummaryBar />
+        </Layout>
+    )
+}
 
 const App: React.FC = () => (
     <ConfigProvider locale={trTR}>

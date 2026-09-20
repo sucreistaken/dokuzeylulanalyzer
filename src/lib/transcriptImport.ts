@@ -142,7 +142,7 @@ export function buildImportPlan(
 
     if (repeated > 0) {
         warnings.push(
-            `${repeated} ders transkriptte birden fazla kez gecti; en guncel kayit alindi.`,
+            `${repeated} ders transkriptte birden fazla kez geçti; en güncel kayıt alındı.`,
         )
     }
 

@@ -354,13 +354,13 @@ export function parseTranscript(pages: TranscriptPage[]): ParsedTranscript {
 
     if (layouts.length === 0) {
         warnings.push(
-            'PDF icinde ders tablosu basligi (KODU / Notu) bulunamadi. Dosyanin ' +
-            'DEBIS "Ogrenci Not Durum Belgesi" oldugundan emin olun.',
+            'PDF içinde ders tablosu başlığı (KODU / Notu) bulunamadı. Dosyanın ' +
+            'DEBİS "Öğrenci Not Durum Belgesi" olduğundan emin ol.',
         )
     } else if (rows.length === 0) {
         warnings.push(
-            'Tablo bulundu ama ders satiri okunamadi. Transkript bicimi beklenenden ' +
-            'farkli olabilir.',
+            'Tablo bulundu ama ders satırı okunamadı. Transkript biçimi beklenenden ' +
+            'farklı olabilir.',
         )
     }
 
@@ -576,8 +576,8 @@ export function parseYokTranscript(pages: TranscriptPage[]): ParsedTranscript {
 
     if (rows.length === 0) {
         warnings.push(
-            'YÖK/e-Devlet transkripti taninamadi ya da ders satiri okunamadi. ' +
-            'Belgenin bozulmadan indirildiginden emin olun.',
+            'YÖK/e-Devlet transkripti tanınamadı ya da ders satırı okunamadı. ' +
+            'Belgenin bozulmadan indirildiğinden emin ol.',
         )
     }
 

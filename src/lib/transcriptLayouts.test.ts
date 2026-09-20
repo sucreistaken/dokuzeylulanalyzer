@@ -163,7 +163,7 @@ describe('farkli sablonlar', () => {
             page(row(200, [[10, 'Bu'], [30, 'bir'], [50, 'transkript'], [110, 'degil']])),
         ])
         expect(parsed.rows).toHaveLength(0)
-        expect(parsed.warnings[0]).toContain('bulunamadi')
+        expect(parsed.warnings[0]).toContain('bulunamadı')
     })
 
     it('bos sayfayi cokmeden gecer', () => {

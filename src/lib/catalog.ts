@@ -33,7 +33,7 @@ export async function loadProgram(programId: string): Promise<ProgramData> {
     const res = await fetch(
         `${import.meta.env.BASE_URL}data/programs/${programId}.json`,
     )
-    if (!res.ok) throw new Error(`Program mufredati alinamadi (${res.status})`)
+    if (!res.ok) throw new Error(`Program müfredatı alınamadı (${res.status})`)
 
     const data = (await res.json()) as ProgramData
     cache.set(programId, data)
