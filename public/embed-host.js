@@ -88,14 +88,25 @@
         '  color: #389e0d; border-radius: 4px; padding: 2px 8px; font-size: 12px;',
         '}',
 
-        /* Dar ekranda yan yana sığmıyor; ray üstte yatay şeride dönüşür. */
+        /* Dar ekranda yan yana sığmıyor; ray üstte yatay şeride dönüşür.
+           align-items sütun düzeninde stretch olmalı: flex-start bırakılırsa
+           araç içeriğine göre daralıp kabın tamamını kullanmıyor. */
         '@media (max-width: 991px) {',
-        '  #deu-arac-duzen { flex-direction: column; }',
+        '  #deu-arac-duzen { flex-direction: column; align-items: stretch; }',
         '  #deu-ozet-ray {',
-        '    position: static; flex: none; width: 100%; max-height: none;',
-        '    flex-direction: row; flex-wrap: wrap; gap: 20px; align-items: center;',
+        '    position: static;',
+        '    flex: none;',
+        '    width: auto;',
+        '    max-height: none;',
+        /* Metrikler eşit sütunlara otursun; serbest sarınca ragged duruyordu. */
+        '    display: grid;',
+        /* 84px'de "184 / 240 (77%)" üç satıra sarıyordu; 140px iki sütun verir. */
+        '    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));',
+        '    gap: 12px 16px;',
+        '    align-items: start;',
         '  }',
-        '  #deu-ozet-ray .ray-program { flex: 1 0 100%; }',
+        '  #deu-ozet-ray .ray-program { grid-column: 1 / -1; }',
+        '  #deu-ozet-ray .ray-onur { grid-column: 1 / -1; }',
         '  #deu-dersanalizi-frame { height: 2200px; }',
         '}',
     ].join('\n')
