@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Card, ConfigProvider, Layout, Spin, Typography } from 'antd'
 import trTR from 'antd/locale/tr_TR'
 import { Provider, useDispatch } from 'react-redux'
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import { BarChartOutlined } from '@ant-design/icons'
-import ProgramPrereq from './pages/ProgramPrereq'
 import { store } from './store'
 import { hydrate } from './store/courseSlice'
 import { loadState } from './lib/storage'
@@ -70,13 +68,7 @@ const AppContent: React.FC = () => {
         )
     }
 
-    return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-            {/* Herkese acik on kosul haritasi; transkript gerektirmez. */}
-            <Route path="/program/:id" element={<ProgramPrereq />} />
-        </Routes>
-    )
+    return <Home />
 }
 
 /** Transkript + kisisel analiz ekrani. */
@@ -107,12 +99,12 @@ const Home: React.FC = () => (
 const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Layout className="min-h-screen">
         <Header className="flex items-center justify-between bg-gray-50 shadow">
-            <Link to="/" className="flex items-center text-inherit">
+            <div className="flex items-center">
                 <BarChartOutlined style={{ fontSize: 24, marginRight: 10 }} />
                 <Title level={3} className="m-3 py-4">
                     DEU Ders Analiz
                 </Title>
-            </Link>
+            </div>
             <div className="hidden text-sm text-gray-500 sm:block">
                 Dokuz Eylul Universitesi
             </div>
@@ -135,11 +127,9 @@ const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const App: React.FC = () => (
     <ConfigProvider locale={trTR}>
         <Provider store={store}>
-            <BrowserRouter>
-                <Shell>
-                    <AppContent />
-                </Shell>
-            </BrowserRouter>
+            <Shell>
+                <AppContent />
+            </Shell>
         </Provider>
     </ConfigProvider>
 )
