@@ -300,20 +300,30 @@ const CourseTable: React.FC = () => {
             // ardindan degistirdigi iki alan (not, durum). Saat/kredi
             // bilgileri nadiren okunur, saga alindi. Kod ve ad yatay
             // kaydirmada sabit kalir ki hangi satirda oldugu kaybolmasin.
-            { title: 'Kod', dataIndex: 'code', key: 'code', width: 100, fixed: 'left' as const },
             {
-                title: 'Ders Adı',
+                // Kod, ad ve tur tek bir kimliktir; ayri sutunlara bolmek
+                // dar ekranda 230px'i bos yere harciyordu.
+                title: 'Ders',
                 dataIndex: 'name',
                 key: 'name',
-                width: 260,
-                fixed: 'left' as const,
-                render: (name: string) => (
+                render: (name: string, record: Course) => (
                     <Tooltip title={name} placement="topLeft">
-                        <span>
-                            {name.length > MAX_NAME_LENGTH
-                                ? `${name.slice(0, MAX_NAME_LENGTH)}...`
-                                : name}
-                        </span>
+                        <div className="leading-tight">
+                            <div className="flex items-center gap-1.5">
+                                <span className="font-medium">{record.code}</span>
+                                <Tag
+                                    color={record.type === 'ZORUNLU' ? 'blue' : 'purple'}
+                                    className="m-0 px-1 text-[10px] leading-4"
+                                >
+                                    {prettyType(record.rawType)}
+                                </Tag>
+                            </div>
+                            <div className="text-gray-600">
+                                {name.length > MAX_NAME_LENGTH
+                                    ? `${name.slice(0, MAX_NAME_LENGTH)}...`
+                                    : name}
+                            </div>
+                        </div>
                     </Tooltip>
                 ),
             },
@@ -351,9 +361,19 @@ const CourseTable: React.FC = () => {
                     />
                 ),
             },
-            { title: 'T', dataIndex: 't', key: 't', width: 44 },
-            { title: 'U', dataIndex: 'u', key: 'u', width: 44 },
-            { title: 'L', dataIndex: 'l', key: 'l', width: 44 },
+            {
+                // Katalogda da "2+2+0" diye tek deger olarak yazilir.
+                title: 'Saat',
+                key: 'hours',
+                width: 76,
+                render: (_: unknown, record: Course) => (
+                    <Tooltip title="Teorik + Uygulama + Laboratuvar">
+                        <span className="whitespace-nowrap text-gray-600">
+                            {record.t}+{record.u}+{record.l}
+                        </span>
+                    </Tooltip>
+                ),
+            },
             {
                 title: 'Kredi',
                 dataIndex: 'credit',
@@ -366,19 +386,6 @@ const CourseTable: React.FC = () => {
                 ),
             },
             { title: 'AKTS', dataIndex: 'ects', key: 'ects', width: 60 },
-            {
-                title: 'Tur',
-                dataIndex: 'rawType',
-                key: 'rawType',
-                width: 130,
-                // Katalogda 14 farkli tur var; Zorunlu/Secmeli ikilisine
-                // indirgemek Erasmus dersini yanlis etiketliyordu.
-                render: (rawType: string, record: Course) => (
-                    <Tag color={record.type === 'ZORUNLU' ? 'blue' : 'purple'}>
-                        {prettyType(rawType)}
-                    </Tag>
-                ),
-            },
             {
                 title: '',
                 key: 'actions',
@@ -493,7 +500,7 @@ const CourseTable: React.FC = () => {
                                     size="small"
                                     pagination={false}
                                     rowHoverable={false}
-                                    scroll={{ x: 1180 }}
+                                    scroll={{ x: 700 }}
                                     className="rounded-lg bg-gray-100 p-1.5 shadow"
                                     rowClassName={(record: Course) => {
                                         if (record.status === 'ALINIYOR') return 'bg-orange-100'
