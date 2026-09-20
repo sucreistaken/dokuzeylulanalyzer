@@ -46,6 +46,7 @@ import { loadProgram } from '../lib/catalog'
 import ElectivePicker, { prettyType } from './ElectivePicker'
 import TranscriptImport from './TranscriptImport'
 import type { Course, CourseStatus, Grade, ProgramData, RootState } from '../types'
+import ScrollHint from './ScrollHint'
 
 const STATUS_LABEL: Record<CourseStatus, string> = {
     ALMADIM: 'Almadim',
@@ -295,12 +296,17 @@ const CourseTable: React.FC = () => {
 
     const columns = useMemo(
         () => [
-            { title: 'Kod', dataIndex: 'code', key: 'code', width: 110 },
+            // Sira kullanicinin is akisina gore: once dersin kimligi, hemen
+            // ardindan degistirdigi iki alan (not, durum). Saat/kredi
+            // bilgileri nadiren okunur, saga alindi. Kod ve ad yatay
+            // kaydirmada sabit kalir ki hangi satirda oldugu kaybolmasin.
+            { title: 'Kod', dataIndex: 'code', key: 'code', width: 100, fixed: 'left' as const },
             {
                 title: 'Ders Adı',
                 dataIndex: 'name',
                 key: 'name',
-                width: 320,
+                width: 260,
+                fixed: 'left' as const,
                 render: (name: string) => (
                     <Tooltip title={name} placement="topLeft">
                         <span>
@@ -309,34 +315,6 @@ const CourseTable: React.FC = () => {
                                 : name}
                         </span>
                     </Tooltip>
-                ),
-            },
-            { title: 'T', dataIndex: 't', key: 't', width: 44 },
-            { title: 'U', dataIndex: 'u', key: 'u', width: 44 },
-            { title: 'L', dataIndex: 'l', key: 'l', width: 44 },
-            {
-                title: 'Kredi',
-                dataIndex: 'credit',
-                key: 'credit',
-                width: 64,
-                render: (credit: number) => (
-                    <Tooltip title="Kredi = T + (U + L) / 2">
-                        <span className="font-medium">{credit}</span>
-                    </Tooltip>
-                ),
-            },
-            { title: 'AKTS', dataIndex: 'ects', key: 'ects', width: 60 },
-            {
-                title: 'Tur',
-                dataIndex: 'rawType',
-                key: 'rawType',
-                width: 130,
-                // Katalogda 14 farkli tur var; Zorunlu/Secmeli ikilisine
-                // indirgemek Erasmus dersini yanlis etiketliyordu.
-                render: (rawType: string, record: Course) => (
-                    <Tag color={record.type === 'ZORUNLU' ? 'blue' : 'purple'}>
-                        {prettyType(rawType)}
-                    </Tag>
                 ),
             },
             {
@@ -371,6 +349,34 @@ const CourseTable: React.FC = () => {
                             label: STATUS_LABEL[s],
                         }))}
                     />
+                ),
+            },
+            { title: 'T', dataIndex: 't', key: 't', width: 44 },
+            { title: 'U', dataIndex: 'u', key: 'u', width: 44 },
+            { title: 'L', dataIndex: 'l', key: 'l', width: 44 },
+            {
+                title: 'Kredi',
+                dataIndex: 'credit',
+                key: 'credit',
+                width: 64,
+                render: (credit: number) => (
+                    <Tooltip title="Kredi = T + (U + L) / 2">
+                        <span className="font-medium">{credit}</span>
+                    </Tooltip>
+                ),
+            },
+            { title: 'AKTS', dataIndex: 'ects', key: 'ects', width: 60 },
+            {
+                title: 'Tur',
+                dataIndex: 'rawType',
+                key: 'rawType',
+                width: 130,
+                // Katalogda 14 farkli tur var; Zorunlu/Secmeli ikilisine
+                // indirgemek Erasmus dersini yanlis etiketliyordu.
+                render: (rawType: string, record: Course) => (
+                    <Tag color={record.type === 'ZORUNLU' ? 'blue' : 'purple'}>
+                        {prettyType(rawType)}
+                    </Tag>
                 ),
             },
             {
@@ -479,6 +485,7 @@ const CourseTable: React.FC = () => {
                             </div>
 
                             {groupCourses.length > 0 && (
+                                <ScrollHint metin="Saat, kredi ve AKTS için sağa kaydır">
                                 <Table
                                     columns={columns}
                                     dataSource={groupCourses}
@@ -486,7 +493,7 @@ const CourseTable: React.FC = () => {
                                     size="small"
                                     pagination={false}
                                     rowHoverable={false}
-                                    scroll={{ x: 1100 }}
+                                    scroll={{ x: 1180 }}
                                     className="rounded-lg bg-gray-100 p-1.5 shadow"
                                     rowClassName={(record: Course) => {
                                         if (record.status === 'ALINIYOR') return 'bg-orange-100'
@@ -495,6 +502,7 @@ const CourseTable: React.FC = () => {
                                         return ''
                                     }}
                                 />
+                                </ScrollHint>
                             )}
 
                             {hasPool && (
