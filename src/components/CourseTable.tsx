@@ -47,6 +47,8 @@ import ElectivePicker, { prettyType } from './ElectivePicker'
 import TranscriptImport from './TranscriptImport'
 import type { Course, CourseStatus, Grade, ProgramData, RootState } from '../types'
 import ScrollHint from './ScrollHint'
+import CourseCards from './CourseCards'
+import { useIsNarrow } from '../lib/useIsNarrow'
 
 const STATUS_LABEL: Record<CourseStatus, string> = {
     ALMADIM: 'Almadim',
@@ -294,6 +296,16 @@ const CourseTable: React.FC = () => {
         })
     }, [dispatch, form])
 
+    // Telefonda tablo kullanilamaz hale geliyor; kart listesine geciyoruz.
+    const dar = useIsNarrow()
+
+    const rowTone = useCallback((record: Course) => {
+        if (record.status === 'ALINIYOR') return 'bg-orange-100'
+        if (isFailing(record.grade)) return 'bg-red-100'
+        if (isPassed(record.grade)) return 'bg-green-50'
+        return ''
+    }, [])
+
     const columns = useMemo(
         () => [
             // Sira kullanicinin is akisina gore: once dersin kimligi, hemen
@@ -491,7 +503,21 @@ const CourseTable: React.FC = () => {
                                 </Space>
                             </div>
 
-                            {groupCourses.length > 0 && (
+                            {groupCourses.length > 0 && dar && (
+                                <CourseCards
+                                    courses={groupCourses}
+                                    gradeOptions={GRADE_OPTIONS}
+                                    gradeLabel={gradeLabel}
+                                    statusOptions={STATUS_OPTIONS}
+                                    statusLabel={STATUS_LABEL}
+                                    onGrade={handleGrade}
+                                    onStatus={handleStatus}
+                                    onRemove={handleRemove}
+                                    rowTone={rowTone}
+                                />
+                            )}
+
+                            {groupCourses.length > 0 && !dar && (
                                 <ScrollHint metin="Saat, kredi ve AKTS için sağa kaydır">
                                 <Table
                                     columns={columns}
@@ -502,12 +528,7 @@ const CourseTable: React.FC = () => {
                                     rowHoverable={false}
                                     scroll={{ x: 700 }}
                                     className="rounded-lg bg-gray-100 p-1.5 shadow"
-                                    rowClassName={(record: Course) => {
-                                        if (record.status === 'ALINIYOR') return 'bg-orange-100'
-                                        if (isFailing(record.grade)) return 'bg-red-100'
-                                        if (isPassed(record.grade)) return 'bg-green-50'
-                                        return ''
-                                    }}
+                                    rowClassName={rowTone}
                                 />
                                 </ScrollHint>
                             )}
