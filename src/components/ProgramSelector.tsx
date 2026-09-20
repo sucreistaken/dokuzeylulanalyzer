@@ -166,7 +166,7 @@ const ProgramSelector: React.FC = () => {
                         options={options}
                         onChange={handleSelect}
                         disabled={!level}
-                        notFoundContent="Eslesen program yok"
+                        notFoundContent="Eşleşen program yok"
                     />
                 </Col>
             </Row>
