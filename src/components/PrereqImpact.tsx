@@ -121,8 +121,8 @@ const PrereqImpact: React.FC = () => {
         <Space direction="vertical" size="large" className="w-full">
             <div>
                 <div className="mb-2 text-sm text-gray-500">
-                    Bir dersten kalirsan, o derse bagli olan dersleri de alamazsin.
-                    Zincir birkac yariyil ileri gidebilir.
+                    Bir dersten kalırsan, o derse bağlı olan dersleri de alamazsın.
+                    Zincir birkaç yarıyıl ileri gidebilir.
                 </div>
                 <Select
                     showSearch
@@ -140,7 +140,7 @@ const PrereqImpact: React.FC = () => {
                 <Alert
                     type={impact.locked.length > 3 ? 'error' : 'warning'}
                     showIcon
-                    message={`${impact.code} ${impact.name} dersinden kalirsan ${impact.locked.length} ders kilitlenir`}
+                    message={`${impact.code} ${impact.name} dersinden kalırsan ${impact.locked.length} ders kilitlenir`}
                     description={
                         <Space direction="vertical" size="middle" className="w-full">
                             <Space size="large" wrap>
@@ -160,7 +160,7 @@ const PrereqImpact: React.FC = () => {
                                 {impact.locked.map((c) => (
                                     <Tag key={c.code} color="volcano">
                                         {c.code} {c.name}
-                                        {c.term !== null ? ` (${c.term}. yariyil)` : ''}
+                                        {c.term !== null ? ` (${c.term}. yarıyıl)` : ''}
                                     </Tag>
                                 ))}
                             </Space>
@@ -171,7 +171,7 @@ const PrereqImpact: React.FC = () => {
 
             <div>
                 <div className="mb-2 font-medium">
-                    Notlarina gore su an alamadigin dersler ({blockedRows.length})
+                    Notlarına göre şu an alamadığın dersler ({blockedRows.length})
                 </div>
                 {blockedRows.length === 0 ? (
                     <Alert
@@ -179,7 +179,7 @@ const PrereqImpact: React.FC = () => {
                         showIcon
                         message="Ön koşul tarafında bilinen bir engel yok."
                         description={
-                            'Kontenjan, ders cakismasi ve danisman onayi burada ' +
+                            'Kontenjan, ders çakışması ve danışman onayı burada ' +
                             'hesaplanmaz; kesin bilgi için kayıt ekranını esas al.'
                         }
                     />
@@ -199,7 +199,7 @@ const PrereqImpact: React.FC = () => {
                                 ),
                             },
                             {
-                                title: 'Yariyil',
+                                title: 'Yarıyıl',
                                 dataIndex: 'course',
                                 width: 90,
                                 render: (c: Course) => c.term ?? '-',

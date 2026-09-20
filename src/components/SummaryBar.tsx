@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tag } from 'antd'
 import { useSelector } from 'react-redux'
 import { TrophyOutlined } from '@ant-design/icons'
 import { honorLabel } from '../lib/grades'
-import { isEmbedded } from '../lib/embed'
+import { isEmbedded, listenForHostRail, sendSummaryToParent } from '../lib/embed'
 import type { RootState } from '../types'
 
 /**
@@ -19,9 +19,36 @@ const SummaryBar: React.FC = () => {
     const { stats, programs, activeProgramId } = useSelector((s: RootState) => s.course)
     const active = programs.find((p) => p.id === activeProgramId)
 
-    if (!active) return null
-
     const embedded = isEmbedded()
+    // Ust pencere ozeti kendisi cizerse biz cizmeyiz: iframe icindeki
+    // position:fixed iframe'in gorus alanina gore konumlanir, uzun bir
+    // iframe'de kullanici kaydirinca cubuk yukarida kalip kaybolur.
+    const [hostDrawsRail, setHostDrawsRail] = useState(false)
+    useEffect(() => listenForHostRail(() => setHostDrawsRail(true)), [])
+
+    const ectsPercentForHost =
+        stats.totalEcts > 0 ? Math.round((stats.earnedEcts / stats.totalEcts) * 100) : 0
+
+    useEffect(() => {
+        sendSummaryToParent(
+            active
+                ? {
+                      programName: active.name,
+                      gpa: stats.gpaCredits > 0 ? stats.gpa.toFixed(2) : '-',
+                      earnedEcts: stats.earnedEcts,
+                      totalEcts: stats.totalEcts,
+                      ectsPercent: ectsPercentForHost,
+                      passedCourses: stats.passedCourses,
+                      remainingCourses: stats.remainingCourses,
+                      honor: stats.gpaCredits > 0 ? honorLabel(stats.gpa) : null,
+                  }
+                : null,
+        )
+    }, [active, stats, ectsPercentForHost])
+
+    if (!active) return null
+    if (embedded && hostDrawsRail) return null
+
     const honor = honorLabel(stats.gpa)
     const ectsPercent =
         stats.totalEcts > 0

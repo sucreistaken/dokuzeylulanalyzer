@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Card, ConfigProvider, Layout, Spin, Typography } from 'antd'
+import { Button, Card, ConfigProvider, Layout, Spin, Typography } from 'antd'
 import trTR from 'antd/locale/tr_TR'
 import { Provider, useDispatch } from 'react-redux'
-import { BarChartOutlined } from '@ant-design/icons'
+import { BarChartOutlined, DownOutlined, UpOutlined } from '@ant-design/icons'
 import { store } from './store'
 import { hydrate } from './store/courseSlice'
 import { loadState } from './lib/storage'
@@ -72,6 +72,59 @@ const AppContent: React.FC = () => {
     return <Home />
 }
 
+/**
+ * Acilip kapanabilen kart. Kullanici her ziyarette ayni kartla ugrasmasin
+ * diye tercih localStorage'da tutulur; storage yoksa (gizli sekme, engelli
+ * cerez) kart varsayilan haliyle acilir.
+ */
+const CollapsibleCard: React.FC<{
+    title: string
+    storageKey: string
+    defaultOpen?: boolean
+    children: React.ReactNode
+}> = ({ title, storageKey, defaultOpen = true, children }) => {
+    const [open, setOpen] = useState(() => {
+        try {
+            const saved = localStorage.getItem(storageKey)
+            return saved === null ? defaultOpen : saved === '1'
+        } catch {
+            return defaultOpen
+        }
+    })
+
+    const toggle = () => {
+        setOpen((prev) => {
+            const next = !prev
+            try {
+                localStorage.setItem(storageKey, next ? '1' : '0')
+            } catch {
+                // Tercih kaydedilemezse sorun degil, oturum boyunca calisir.
+            }
+            return next
+        })
+    }
+
+    return (
+        <Card
+            title={title}
+            className="shadow"
+            extra={
+                <Button
+                    type="text"
+                    size="small"
+                    onClick={toggle}
+                    icon={open ? <UpOutlined /> : <DownOutlined />}
+                >
+                    {open ? 'Gizle' : 'Göster'}
+                </Button>
+            }
+            styles={open ? undefined : { body: { display: 'none' } }}
+        >
+            {children}
+        </Card>
+    )
+}
+
 /** Transkript + kisisel analiz ekrani. */
 const Home: React.FC = () => (
     <div className="flex flex-col space-y-5">
@@ -87,9 +140,9 @@ const Home: React.FC = () => (
         <Card title="İstatistikler" className="shadow">
             <CourseStats />
         </Card>
-        <Card title="Ön Koşul Etkisi" className="shadow">
+        <CollapsibleCard title="Ön Koşul Etkisi" storageKey="deu.card.prereq" defaultOpen={false}>
             <PrereqImpact />
-        </Card>
+        </CollapsibleCard>
         <Card title="Ders Planı" className="shadow">
             <CourseTable />
         </Card>
