@@ -1,0 +1,22 @@
+<!--
+  dokuzeylul.net forumunda ACP > Genişletme > Bileşenler >
+  ders-analizi.tpl > Header alanındaki HTML widget'ının tam içeriği.
+
+  Buradaki tek iş iskeleti kurmak; düzen, stil ve mantık
+  embed-host.js içinde ve bu repoda versiyonlanıyor.
+  Araç her deploy edildiğinde forum tarafı kendiliğinden güncellenir,
+  bu widget'a bir daha dokunmak gerekmez.
+-->
+<div id="deu-arac-duzen">
+    <aside id="deu-ozet-ray" hidden></aside>
+    <div id="deu-dersanalizi-wrapper">
+        <iframe id="deu-dersanalizi-frame"
+            src="https://deu.kadiray.com/?embed=1"
+            title="DEÜ Ders Analizi"
+            allow="clipboard-read; clipboard-write; fullscreen"
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<script src="https://deu.kadiray.com/embed-host.js"></script>
