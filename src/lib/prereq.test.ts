@@ -190,6 +190,41 @@ describe('blockers, onkosul kurali (ver5 MADDE 6/5)', () => {
         expect(blockers(course, ctx({ grades: { 'İNŞ 1012': 'M' } }))).toEqual([])
     })
 
+    it('Devamsiz (D) ve Yetersiz (Y) onkosulu saglamaz', () => {
+        expect(blockers(course, ctx({ grades: { 'İNŞ 1012': 'D' } }))[0].kind)
+            .toBe('PREREQ_FAILED')
+        expect(blockers(course, ctx({ grades: { 'İNŞ 1012': 'Y' } }))[0].kind)
+            .toBe('PREREQ_FAILED')
+    })
+
+    it('gecici notlar (E, G, H, F, U) onkosulu saglamaz', () => {
+        // Ders su an aliniyor ya da notu henuz kesinlesmemis: engel devam eder.
+        for (const grade of ['E', 'G', 'H', 'F', 'U'] as const) {
+            expect(blockers(course, ctx({ grades: { 'İNŞ 1012': grade } })))
+                .toHaveLength(1)
+        }
+    })
+
+    it('muhendislik disi fakultede onkosul kilit degil, uyaridir', () => {
+        // Yonetmelik MADDE 6/5 genel kurali devam kosuluyla ders almaya izin
+        // veriyor; sertlestirme Muhendislik Fakultesi esaslarina ozel. Diger
+        // fakultelerde "alamazsin" demek yerine uyari gosterilir.
+        const found = blockers(
+            course,
+            ctx({ grades: { 'İNŞ 1012': 'FF' }, faculty: 'Edebiyat Fakültesi' }),
+        )
+        expect(found).toHaveLength(1)
+        expect(found[0].severity).toBe('warning')
+    })
+
+    it('onkosul dersi su an tekrar aliniyorsa (eski not FF) engel surer', () => {
+        // Devam eden tekrar notu silmedigi icin not FF kalir; MADDE 6/5 geregi
+        // ders "basarilmis" sayilmaz.
+        const found = blockers(course, ctx({ grades: { 'İNŞ 1012': 'FF' } }))
+        expect(found).toHaveLength(1)
+        expect(found[0].severity).toBe('blocked')
+    })
+
     it('birden fazla onkosul ayri ayri raporlanir', () => {
         const two = make('XXX 3001', {
             prerequisites: [

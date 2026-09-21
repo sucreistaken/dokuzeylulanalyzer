@@ -255,6 +255,19 @@ const GPA_EXEMPT_PREFIXES = [
  */
 const GPA_FLOOR_FACULTIES = new Set(['Mühendislik Fakültesi'])
 
+/**
+ * Onkosulun KESIN engel oldugu fakulteler.
+ *
+ * Yonetmelik MADDE 6/5 genel kurali daha yumusak: onkosul dersinden MADDE 20/1
+ * kosullari (devam) saglanmissa bagli ders sonraki yariyillarda alinabilir.
+ * Muhendislik Fakultesi esaslari (ver5 MADDE 6/5) bunu sertlestirir:
+ * "ders veya dersler BASARILMIS olmadikca o ders alinamaz."
+ *
+ * Diger fakultelerin kendi esaslari okunmadi; orada kilit yerine uyari
+ * gosterilir. Yanlis "alamazsin" demek, hic bir sey dememekten kotudur.
+ */
+const PREREQ_STRICT_FACULTIES = new Set(['Mühendislik Fakültesi'])
+
 export const GPA_FLOOR = 1.8
 
 /** ver5 MADDE 9/3 istisna listesi. */
@@ -289,7 +302,7 @@ export function blockers(
 
         out.push({
             kind: isFailing(grade) ? 'PREREQ_FAILED' : 'PREREQ_MISSING',
-            severity: 'blocked',
+            severity: PREREQ_STRICT_FACULTIES.has(ctx.faculty) ? 'blocked' : 'warning',
             code: pre.code,
             name: pre.name,
         })
