@@ -15,6 +15,7 @@ import PrereqImpact from './components/PrereqImpact'
 import TranscriptImport from './components/TranscriptImport'
 import SummaryBar from './components/SummaryBar'
 import { isEmbedded, reportHeightToParent } from './lib/embed'
+import { useEmbedModalScrollFix } from './lib/useEmbedModalScrollFix'
 
 const { Header, Content, Footer } = Layout
 const { Title } = Typography
@@ -154,6 +155,7 @@ const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const embedded = isEmbedded()
 
     useEffect(() => reportHeightToParent(), [])
+    useEmbedModalScrollFix()
 
     return (
         <Layout className="min-h-screen">

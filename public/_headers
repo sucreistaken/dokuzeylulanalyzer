@@ -1,0 +1,12 @@
+# Cloudflare Pages başlıkları.
+
+# embed-host.js forumun içine gömülü çalışıyor ve sürüm numarası taşımıyor:
+# varsayılan 4 saatlik önbellekle, buradan yapılan bir düzeltme foruma
+# saatlerce ulaşmıyordu. Kısa ömür + revalidate, deploy'un dakikalar içinde
+# görünmesini sağlar. Dosya küçük (7 KB), maliyeti önemsiz.
+/embed-host.js
+  Cache-Control: public, max-age=60, must-revalidate
+
+# Vite çıktısı içerik özetli isimler kullanıyor, uzun önbellek güvenli.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

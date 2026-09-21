@@ -180,6 +180,17 @@
             }
             if (d.ready) bildir()
             if ('summary' in d) ciz(d.summary)
+
+            // Aractaki bir modal (secmeli ders ekle, sil onayi, vb.) acildi.
+            // Modal iframe'in tepesine yakin belirir (bkz. dosya basi notu);
+            // o nokta zaten ekrandaysa kaydirmaya gerek yok.
+            if (d.scrollIntoView) {
+                var frameTepesi = frame.getBoundingClientRect().top
+                var zatenGorunuyor = frameTepesi >= 0 && frameTepesi <= window.innerHeight - 200
+                if (!zatenGorunuyor) {
+                    frame.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+            }
         })
     }
 

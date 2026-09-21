@@ -73,6 +73,22 @@ export const listenForHostRail = (onHostRail: () => void): (() => void) => {
 }
 
 /**
+ * Ust pencereden iframe'i gorunum alanina kaydirmasini ister.
+ *
+ * Neden gerekli: bir modal/onay penceresi acildiginda maskesi ve icerigi
+ * position:fixed kullanir; bu da (dosya basindaki notta anlatildigi gibi)
+ * iframe'in kendi gorus alanina gore konumlanir, gercek ekrana degil.
+ * Kullanici sayfayi kaydirmisken bir modal acarsa, modal iframe'in
+ * tepesinde -yani ekranin disinda- belirir ve fark edilmez. Bu fonksiyon
+ * ust pencereden iframe'i yukari kaydirmasini istenerek modali tekrar
+ * gorunur kilar.
+ */
+export const requestScrollIntoView = (): void => {
+    if (!isEmbedded()) return
+    post({ scrollIntoView: true })
+}
+
+/**
  * Icerik yuksekligini ust pencereye bildirir; ust taraf iframe'i buna gore
  * boyutlandirabilir. Ust pencere dinlemiyorsa mesaj sessizce kaybolur.
  *
