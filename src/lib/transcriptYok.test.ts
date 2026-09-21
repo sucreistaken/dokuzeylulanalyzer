@@ -93,8 +93,8 @@ describe('summarize eslesmeyenleri sayar (baska universite senaryosu)', () => {
         // Onizleme GANO'su transkriptin resmi GNO'su ile tutmali (2.32).
         const result = summarize(plan, GRADE_POINTS, true)
         expect(result.gpa).toBeCloseTo(2.32, 2)
-        // summarize.ects notu olan tum dersleri sayar (basarisizlar dahil);
-        // "kazanilan" AKTS'den (calculateStats) fazladir, en az onun kadardir.
+        // summarize.ects yalnizca GECILEN dersleri sayar, yani ice aktarim
+        // sonrasi istatistikteki "Kazanilan AKTS" ile ayni tanimdir.
         expect(result.ects).toBeGreaterThanOrEqual(232)
     })
 })

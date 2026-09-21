@@ -25,7 +25,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import {
     GRADE_OPTIONS,
-    NON_GPA_GRADES,
+    SPECIAL_GRADE_LABELS,
     STATUS_OPTIONS,
     calculateGpa,
     isFailing,
@@ -58,7 +58,7 @@ const STATUS_LABEL: Record<CourseStatus, string> = {
 
 const gradeLabel = (grade: Grade): string => {
     if (grade === 'NA') return '-'
-    const special = NON_GPA_GRADES[grade]
+    const special = SPECIAL_GRADE_LABELS[grade]
     return special ? `${grade} (${special})` : grade
 }
 

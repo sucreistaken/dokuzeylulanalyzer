@@ -51,7 +51,16 @@ export interface TranscriptRow {
     grade: string
     /** "Gecti" / "Almadi" / "Devam" */
     status: string
-    /** 1-based yariyil numarasi; cikarilamazsa null */
+    /**
+     * DEBIS belgesinde: mufredattaki yariyil numarasi ("BIRINCI YARIYIL" -> 1).
+     * e-Devlet belgesinde: donem bloklarinin KRONOLOJIK sirasi (1'den baslar),
+     * cunku o belge mufredat yariyilini yazmaz. Ikisi de 1-based; cikarilamazsa
+     * null.
+     *
+     * Kronolojik sira "hangi kayit daha guncel" sorusunu cozmek icin sart
+     * (tekrarda son not gecerli). Mufredat yariyili olarak kullanildigi tek yer
+     * transcriptImport.toCustomCourse'tur ve orada yaklasik bir yerlestirmedir.
+     */
     term: number | null
 }
 
@@ -407,8 +416,17 @@ const YOK_COLUMNS: Array<{ key: string; to: number }> = [
 /** e-Devlet kodu: "ENG 101", "MATH 153", "CEST 400", "SE 115". */
 const YOK_CODE_RE = /^[A-ZÇĞİÖŞÜ]{2,5}\s?\d{2,4}$/
 
-/** "1. YARIYIL" degil; "2022-2023 Guz/Bahar/Yaz Donemi" bicimi. */
-const YOK_TERM_RE = /(G[üu]z|Bahar|Yaz)\s*D[öo]nemi/i
+/**
+ * "1. YARIYIL" degil; "2022-2023 Guz/Bahar/Yaz Donemi" bicimi.
+ * Yaz ogretimi bazi belgelerde "Yaz Okulu" yazar.
+ *
+ * Yaz ogretimi mufredatta ayri bir yariyil DEGILDIR (Yaz Ogretimi Uygulama
+ * Esaslari MADDE 1; notu MADDE 16 geregi dersin kendi yariyilinda degerlendirilir)
+ * ama belgede ayri bir blok olarak basilir ve o blok kronolojik olarak Bahar'dan
+ * SONRADIR. Blogu saymazsak yaz kayitlari Bahar'la ayni siraya duser ve
+ * "hangisi daha guncel" karsilastirmasi bozulur.
+ */
+const YOK_TERM_RE = /(G[üu]z|Bahar|Yaz)\s*(D[öo]nemi|Okulu)/i
 
 /** Bir satiri sabit oran sutunlarina dagitir. */
 function yokCells(row: TranscriptWord[], pageWidth: number): Record<string, string> {
@@ -526,12 +544,35 @@ export function parseYokTranscript(pages: TranscriptPage[]): ParsedTranscript {
         }
     }
 
-    // Tekrarlanan dersi tekille: ayni kod icin en son donemdeki kayit gecerli.
+    // Tekrarlanan dersi tekille. Yonetmelik (MADDE 9) "son BASARI notu" der:
+    // ogrenci dersi su an tekrar aliyorsa ve notu henuz girilmemisse ESKI not
+    // gecerlidir. Notsuz kaydi ustune yazmak ogrencinin ortalamasini oldugundan
+    // yuksek gosteriyordu (basarisiz dersler ortalamadan dusuyordu).
     const byCode = new Map<string, YokRawRow>()
+    /** Ders kodu -> notsuz (devam eden) kaydin en son donemi. */
+    const ungradedTerm = new Map<string, number>()
     for (const r of raw) {
         const existing = byCode.get(r.code)
-        if (!existing || (r.term ?? 0) > (existing.term ?? 0)) byCode.set(r.code, r)
+        if (r.grade === '-') {
+            const term = r.term ?? 0
+            ungradedTerm.set(r.code, Math.max(ungradedTerm.get(r.code) ?? 0, term))
+            // Notsuz kayit yalnizca hic notu olmayan ders icin temsilcidir.
+            if (!existing) byCode.set(r.code, r)
+            continue
+        }
+        const better =
+            !existing || existing.grade === '-' || (r.term ?? 0) > (existing.term ?? 0)
+        if (better) byCode.set(r.code, r)
     }
+
+    /**
+     * Ders su an aliniyor mu: notsuz kayit, gecerli nottan SONRAKI (ya da ayni)
+     * donemde olmali. Eski bir donemde notsuz kalip sonraki donemde notla
+     * kapanmis ders "aliniyor" sayilmaz.
+     */
+    const isOngoing = (r: YokRawRow): boolean =>
+        (ungradedTerm.get(r.code) ?? -1) >= (r.term ?? 0)
+
     const deduped = [...byCode.values()].sort((a, b) => (a.term ?? 0) - (b.term ?? 0))
 
     // Kendini dogrulama icin toplamlar. GANO uygulamayla ayni yontemde (YEREL
@@ -570,7 +611,9 @@ export function parseYokTranscript(pages: TranscriptPage[]): ParsedTranscript {
         credit: r.credit,
         repeat: 1,
         grade: r.grade,
-        status: r.status,
+        // Devam eden kaydi olan ders "aliniyor" sayilir: notu (varsa eski notu)
+        // ortalamada kalir ama ogrenciye ders bitmis gibi gosterilmez.
+        status: isOngoing(r) ? 'Devam Ediyor' : r.status,
         term: r.term,
     }))
 

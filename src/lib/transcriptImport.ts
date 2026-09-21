@@ -5,7 +5,7 @@
  * onizlemede gosterilir. Taninmayan not/durum uyari uretir.
  */
 
-import { GRADE_OPTIONS } from './grades'
+import { GRADE_OPTIONS, isPassed } from './grades'
 import type { CatalogCourse, CourseStatus, Grade, TermRequirement } from '../types'
 import type { TranscriptRow } from './transcript'
 
@@ -77,16 +77,26 @@ export function toStatus(rawStatus: string, grade: Grade): CourseStatus {
     return 'ALDIM'
 }
 
+const hasGrade = (row: TranscriptRow): boolean =>
+    row.grade !== '-' && row.grade !== ''
+
+/** Transkriptteki durum metni "su an aliyorum" diyor mu? */
+const isOngoing = (row: TranscriptRow): boolean =>
+    /devam\s*ed|al[iı]yor|s[uü]r[uü]yor/i.test(row.status)
+
 /**
- * Ayni ders birden fazla kez alinmissa (tekrar) en guncel kayit kazanir:
- * once tekrar sayisi (TS) yuksek olan, esitse notu olan.
+ * Ayni ders birden fazla kez alinmissa (tekrar) hangi kayit gecerli:
+ * once NOTU OLAN kayit, sonra tekrar sayisi (TS) yuksek olan.
+ *
+ * Notu olan kaydin oncelikli olmasi sart: ogrenci dersi su an tekrar aliyorsa
+ * yeni kaydin notu henuz bostur ve onu secmek eski notu ortalamadan silerdi
+ * (yonetmelik: tekrarda "son BASARI notu" gecerlidir).
  */
 function pickLatest(rows: TranscriptRow[]): TranscriptRow {
     return rows.reduce((best, row) => {
+        if (hasGrade(row) !== hasGrade(best)) return hasGrade(row) ? row : best
         if (row.repeat !== best.repeat) return row.repeat > best.repeat ? row : best
-        const bestHasGrade = best.grade !== '-' && best.grade !== ''
-        const rowHasGrade = row.grade !== '-' && row.grade !== ''
-        return !bestHasGrade && rowHasGrade ? row : best
+        return best
     })
 }
 
@@ -124,7 +134,10 @@ export function buildImportPlan(
             )
             continue
         }
-        const status = toStatus(row.status, grade)
+        // Notu eski kayittan aliyoruz; ama gruptaki herhangi bir kayit "devam
+        // ediyor" diyorsa ders bitmemistir, "aliniyor" olarak isaretlenir.
+        const ongoing = group.some(isOngoing)
+        const status = ongoing ? 'ALINIYOR' : toStatus(row.status, grade)
         const course = byCode.get(code)
 
         if (course) {
@@ -172,7 +185,10 @@ export function summarize(
             credits += credit
             points += credit * point
         }
-        if (grade !== 'NA' && status !== 'ALINIYOR') ects += courseEcts
+        // "Kazanilan AKTS": yalnizca GECILEN dersler. Kalinan ders (FD/FF/Y/D)
+        // ve devam eden ders AKTS kazandirmaz; aksi halde onizlemedeki sayi
+        // ice aktarim sonrasi istatistikten buyuk cikip kullaniciyi yaniltiyordu.
+        if (isPassed(grade) && status !== 'ALINIYOR') ects += courseEcts
     }
 
     for (const entry of plan.matched) {

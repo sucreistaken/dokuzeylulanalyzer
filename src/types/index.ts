@@ -1,9 +1,16 @@
-/** Ortalamaya giren harf notlari. */
+/**
+ * Ortalamaya giren harf notlari.
+ * D (Devamsiz) da ortalamaya girer ama harf notu degildir; SpecialGrade'te.
+ */
 export type LetterGrade =
     | 'AA' | 'BA' | 'BB' | 'CB' | 'CC' | 'DC' | 'DD' | 'FD' | 'FF'
 
-/** Ortalamaya girmeyen notlar + alinmadi. */
-export type SpecialGrade = 'B' | 'M' | 'Y' | 'D' | 'E' | 'NA'
+/**
+ * Harf disi notlar + alinmadi. Transkript lejantlarindan toplandi:
+ * DEBIS (B/D/Y/H/F/U/E/M) ve e-Devlet (B/D/M/G).
+ */
+export type SpecialGrade =
+    | 'B' | 'M' | 'Y' | 'D' | 'E' | 'G' | 'H' | 'F' | 'U' | 'NA'
 
 export type Grade = LetterGrade | SpecialGrade
 

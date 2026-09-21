@@ -23,25 +23,38 @@ export const GRADE_POINTS: Record<string, number> = {
     DD: 1.0,
     FD: 0.5,
     FF: 0.0,
+    // Devamsiz. Transkriptin kendi lejandi: "D (Devamsiz) ... not ortalamasi
+    // hesabinda FF notu islemi gorur." Yani kredisi paydaya yazilir ve 0.00
+    // katsayi ile ortalamaya girer. Gercek belgede dogrulandi
+    // (transcriptYokActiveTerm.test.ts): D haric tutulunca GNO tutmuyor.
+    D: 0.0,
 }
 
 /**
- * Ortalamaya girmeyen notlar. Transkript lejantindan alindi.
- * Bunlarin kredisi ortalama paydasina yazilmaz ama AKTS'si sayilabilir.
+ * Harf disi notlarin aciklamalari; yalnizca gosterim icin.
+ * Liste iki transkript lejandinin birlesimi: DEBIS (B/Y/D/H/F/U/E/M) ve
+ * e-Devlet (B/D/M/G). Taninmayan not "bu ders atlandi" uyarisi uretip dersi
+ * ice aktarimdan dusurdugu icin liste eksiksiz tutulmali.
+ *
+ * Y ve B kredisiz derslere verilir, ortalamaya girmezler. D girer (yukariya bak).
  */
-export const NON_GPA_GRADES: Record<string, string> = {
+export const SPECIAL_GRADE_LABELS: Record<string, string> = {
     B: 'Başarılı',
     M: 'Muaf',
     Y: 'Yetersiz',
     D: 'Devamsiz',
     E: 'Eksik Not',
+    G: 'Gelişmekte Olan',
+    H: 'Hak Dondurdu',
+    F: 'Final Hakkı Saklı',
+    U: 'Bütünleme Hakkı Saklı',
 }
 
 /** Not seciminde gosterilecek siralama. */
 export const GRADE_OPTIONS: Grade[] = [
     'NA',
     'AA', 'BA', 'BB', 'CB', 'CC', 'DC', 'DD', 'FD', 'FF',
-    'B', 'M', 'Y', 'D', 'E',
+    'B', 'M', 'Y', 'D', 'E', 'G', 'H', 'F', 'U',
 ]
 
 /** FD ve FF basarisiz sayilir (yonetmelik MADDE 26). */

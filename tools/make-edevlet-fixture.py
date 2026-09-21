@@ -7,10 +7,10 @@ YÖK barkodu) icerir ve repoya ASLA girmez. Bu script kelime-koordinat akisini
 cikarir, kimlik alanlarini maskeler ve testlerin kullanacagi JSON'u yazar.
 
 Kullanim:
-    python3 tools/make-edevlet-fixture.py ~/Downloads/transkript.pdf
+    python3 tools/make-edevlet-fixture.py ~/Downloads/transkript.pdf [cikti.json]
 
 Cikti:
-    src/lib/__fixtures__/edevlet-words.json
+    src/lib/__fixtures__/edevlet-words.json (ikinci argüman verilmezse)
 
 Bagimlilik: poppler-utils (pdftotext). macOS: brew install poppler
 """
@@ -104,15 +104,16 @@ def extract(pdf_path):
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 3):
         print(__doc__)
         sys.exit(1)
+    out = sys.argv[2] if len(sys.argv) == 3 else OUT
     pages = extract(sys.argv[1])
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", encoding="utf-8") as f:
         json.dump(pages, f, ensure_ascii=False)
     words = sum(len(p["words"]) for p in pages)
-    print(f"Yazildi: {OUT} ({len(pages)} sayfa, {words} kelime)")
+    print(f"Yazildi: {out} ({len(pages)} sayfa, {words} kelime)")
 
 
 if __name__ == "__main__":
